@@ -11,15 +11,22 @@ const createUser = async (req, res) => {
         status: "ERR",
         message: "The input is required",
       });
-    } else if (!isCheckEmail) {
+    }
+    else if (password?.length < 5) {
       return res.status(200).json({
         status: "ERR",
-        message: "The input is email",
+        message: "Mật khẩu ít nhất 5 kí tự",
+      });
+    }
+    else if (!isCheckEmail) {
+      return res.status(200).json({
+        status: "ERR",
+        message: "Email phải có dạng @gmail.com",
       });
     } else if (password !== confirmPassword) {
       return res.status(200).json({
         status: "ERR",
-        message: "The password is equal confirmPasword",
+        message: "Xác nhận mật khẩu và mật khẩu không trùng khớp",
       });
     }
     const response = await UserService.createUser(req.body);

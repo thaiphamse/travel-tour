@@ -3,11 +3,12 @@ const Post = require("../models/PostModel");
 const EmailService = require("./EmailService");
 const createPost = (newPost) => {
   return new Promise(async (resolve, reject) => {
-    const { title, content, likeCount, image } = newPost;
+    const { title, content, type, likeCount, image } = newPost;
     try {
       const createPost = await Post.create({
         title,
         content,
+        type,
         likeCount,
         image,
       });
@@ -26,7 +27,7 @@ const createPost = (newPost) => {
 const getAllPost = () => {
   return new Promise(async (resolve, reject) => {
     try {
-      const allPost = await Post.find();
+      const allPost = await Post.find().sort({ createdAt: -1 });
       resolve({
         status: "OK",
         message: "success",
@@ -207,7 +208,7 @@ const getLikePost = async (id) => {
           message: "No posts found for the user.",
         };
       }
-      const numberLike = posts?.data?.likeCount?.length
+      const numberLike = posts?.data?.likeCount?.length;
       resolve({
         status: "OK",
         message: "success",

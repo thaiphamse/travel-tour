@@ -27,7 +27,6 @@ const createOtp = (newOtp) => {
 const deleteOtp = (newOtp) => {
   return new Promise(async (resolve, reject) => {
     const { otp } = newOtp;
-    console.log("otp", otp);
     try {
       const checkOtp = await Otp.findOne({
         otp: otp,

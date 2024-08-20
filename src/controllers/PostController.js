@@ -4,8 +4,8 @@ const { post } = require("../routes/PostRouter");
 
 const createPost = async (req, res) => {
   try {
-    const { title, content } = req.body;
-    if (!title || !content) {
+    const { title, content, type } = req.body;
+    if (!title || !content || !type) {
       return res.status(200).json({
         status: "ERR",
         message: "The input is required",
@@ -135,7 +135,7 @@ const getPostLiked = async (req, res) => {
 };
 const getLikePost = async (req, res) => {
   try {
-    const  idPost  = req.params.id;
+    const idPost = req.params.id;
     const response = await PostService.getLikePost(idPost);
     return res.status(200).json(response);
   } catch (e) {

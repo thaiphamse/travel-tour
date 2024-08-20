@@ -88,14 +88,17 @@ const updateUser = (id, data) => {
           status: "OK",
           message: "The user is not defined",
         });
-      }
-      const updateUser = await User.findByIdAndUpdate(id, data, { new: true });
+      } else {
+        const updateUser = await User.findByIdAndUpdate(id, data, {
+          new: true,
+        });
 
-      resolve({
-        status: "OK",
-        message: "success",
-        data: updateUser,
-      });
+        resolve({
+          status: "OK",
+          message: "success",
+          data: updateUser,
+        });
+      }
     } catch (e) {
       reject(e);
     }
@@ -113,13 +116,14 @@ const deleteUser = (id) => {
           status: "OK",
           message: "The user is not defined",
         });
-      }
-      await User.findByIdAndDelete(id);
+      } else {
+        await User.findByIdAndDelete(id);
 
-      resolve({
-        status: "OK",
-        message: "success",
-      });
+        resolve({
+          status: "OK",
+          message: "success",
+        });
+      }
     } catch (e) {
       reject(e);
     }

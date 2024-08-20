@@ -2,8 +2,7 @@ const dotenv = require("dotenv");
 dotenv.config;
 const nodemailer = require("nodemailer");
 
-const sendEmailCreateOrder = async (orderItems, email) => {
-  console.log("orderItems, email", orderItems, email);
+const sendEmailCreateOrder = async (orderItems, email, totalPrice) => {
   let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
@@ -25,6 +24,7 @@ const sendEmailCreateOrder = async (orderItems, email) => {
     </div>`;
     attachImage.push({ path: order.image });
   });
+  listItem += `<div>Tổng giá trị đơn hàng là: <strong>${totalPrice} VND</strong></div>`;
 
   // async..await is not allowed in global scope, must use a wrapper
   // send mail with defined transport object
@@ -39,7 +39,6 @@ const sendEmailCreateOrder = async (orderItems, email) => {
 };
 
 const sendEmailUpdateProductToFollowers = async (data) => {
-  console.log("product, data", data);
   let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
@@ -64,7 +63,6 @@ const sendEmailUpdateProductToFollowers = async (data) => {
   // send mail with defined transport object
   const emails = data.followers.map((follower) => follower.email);
   const emailString = emails.join(", ");
-  console.log("emailString", emailString);
 
   let info = await transporter.sendMail({
     from: "hoangphongvl2021@gmail.com", // sender address
@@ -72,6 +70,42 @@ const sendEmailUpdateProductToFollowers = async (data) => {
     subject: "Sản phẩm bạn theo dõi đã được cập nhật", // Subject line
     text: "Hello world?", // plain text body
     html: `<div><b>Sản phẩm đã thay đổi </b></div> ${productDetail}`,
+    attachments: attachImage,
+  });
+};
+
+const sendEmailDiscountProductToFollowers = async (data) => {
+  let transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+      // TODO: replace `user` and `pass` values from <https://forwardemail.net>
+      user: process.env.MAIL_ACCOUNT,
+      pass: process.env.MAIL_PASSWORD,
+    },
+  });
+
+  let productDetail = "";
+  const attachImage = [];
+
+  productDetail += `<div>
+    <div>
+      Tên sản phẩm là <b>${data?.name}</b> đang giảm giá là: <b>${data?.value}</b>%</div>
+      <div>Bên dưới là hình ảnh của sản phẩm</div>
+      </div>`;
+  attachImage.push({ path: data.image });
+  // async..await is not allowed in global scope, must use a wrapper
+  // send mail with defined transport object
+  const emails = data.followers.map((follower) => follower.email);
+  const emailString = emails.join(", ");
+
+  let info = await transporter.sendMail({
+    from: "hoangphongvl2021@gmail.com", // sender address
+    to: emailString != "" ? emailString : "hoangphongvl2021@gmail.com", // list of receivers
+    subject: "Sản phẩm bạn theo dõi đã được cập nhật", // Subject line
+    text: "Hello world?", // plain text body
+    html: `<div><b>Sản phẩm bạn theo dõi đang giảm giá </b></div> ${productDetail}`,
     attachments: attachImage,
   });
 };
@@ -100,5 +134,6 @@ const sendEmailOtp = async (email, otp) => {
 module.exports = {
   sendEmailCreateOrder,
   sendEmailUpdateProductToFollowers,
+  sendEmailDiscountProductToFollowers,
   sendEmailOtp,
 };

@@ -4,7 +4,7 @@ const JwtService = require("../services/JwtService");
 const createComment = async (req, res) => {
   try {
     const { name, avatar, content } = req.body;
-    if (!content || !name || !avatar ) {
+    if (!content || !name || !avatar) {
       return res.status(200).json({
         status: "ERR",
         message: "The input is required",

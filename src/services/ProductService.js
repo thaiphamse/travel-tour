@@ -20,28 +20,28 @@ const createProduct = (newProduct) => {
       });
       if (checkProduct !== null) {
         resolve({
-          status: "OK",
+          status: "ERR",
           message: "The name of product is already",
         });
-      }
-
-      const createProduct = await Product.create({
-        name,
-        image,
-        type,
-        price,
-        countInStock,
-        rating,
-        description,
-        discount,
-        followers,
-      });
-      if (createProduct) {
-        resolve({
-          status: "OK",
-          message: "success",
-          data: createProduct,
+      } else {
+        const createProduct = await Product.create({
+          name,
+          image,
+          type,
+          price,
+          countInStock,
+          rating,
+          description,
+          discount,
+          followers,
         });
+        if (createProduct) {
+          resolve({
+            status: "OK",
+            message: "success",
+            data: createProduct,
+          });
+        }
       }
     } catch (e) {
       reject(e);
@@ -155,8 +155,6 @@ const getAllProduct = (limit, page, sort, filter) => {
       const totalProduct = await Product.count();
       if (filter) {
         const label = filter[0];
-        console.log("filter", filter);
-        console.log("label", label);
         const allObjectFilter = await Product.find({
           [label]: { $regex: filter[1] },
         })
@@ -173,10 +171,8 @@ const getAllProduct = (limit, page, sort, filter) => {
       }
 
       if (sort) {
-        console.log("sort", sort);
         const objectSort = {};
         objectSort[sort[1]] = sort[0];
-        console.log("objectsort", objectSort);
         const allProductSort = await Product.find()
           .limit(limit)
           .skip(page * limit)

@@ -14,6 +14,7 @@ router.delete(
   discountController.deleteDiscount
 );
 router.get("/get-all-discount", discountController.getAllDiscount);
+router.post("/delete-many-discount",  discountController.deleteManyDiscount);
 router.put(
   "/update-discount/:id",
   authMiddleWare,

@@ -13,8 +13,6 @@ const createProduct = async (req, res) => {
       description,
       discount,
     } = req.body;
-    console.log("Req body", req.body);
-
     if (
       !name ||
       !image ||

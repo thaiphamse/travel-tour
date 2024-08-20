@@ -13,6 +13,7 @@ const PostSchema = new mongoose.Schema(
         },
       },
     ],
+    type: { type: String },
     image: [
       {
         urlImage: { type: String },
