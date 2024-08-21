@@ -55,15 +55,16 @@ const loginUser = async (req, res) => {
       });
     }
     const response = await UserService.loginUser(req.body);
-    const { refresh_token, ...newResponse } = response;
-    res.cookie("refresh_token", refresh_token, {
+    console.log(response)
+    const { access_token, ...newResponse } = response;
+    res.cookie("access_token", access_token, {
       httpOnly: true,
       secure: true, //thêm bảo mật phía client
       sameSite: "Lax",
       path: "/",
       domain: "localhost",
     });
-    return res.status(200).json({ ...newResponse, refresh_token });
+    return res.status(200).json({ ...newResponse, access_token });
   } catch (e) {
     return res.status(404).json({
       message: e,
@@ -89,20 +90,24 @@ const updateUser = async (req, res) => {
   try {
     const userId = req.params.id;
     const data = req.body;
+
     if (!userId) {
       return res.status(200).json({
         status: "ERR",
         message: "The userId is required",
       });
     }
+
     const response = await UserService.updateUser(userId, data);
     return res.status(200).json(response);
+
   } catch (e) {
     return res.status(404).json({
       message: e,
     });
   }
 };
+
 const deleteUser = async (req, res) => {
   try {
     const userId = req.params.id;
@@ -170,7 +175,8 @@ const getDetailUser = async (req, res) => {
 
 const refreshToken = async (req, res) => {
   try {
-    let token = req.headers.token.split(" ")[1];
+    let token = req.headers.cookie.split('=')[1]
+    console.log(token)
     // const token = req.cookies.refresh_token;
     if (!token) {
       return res.status(200).json({

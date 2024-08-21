@@ -1,43 +1,116 @@
 const PlaceService = require("../services/PlaceService");
 const JwtService = require("../services/JwtService");
 
-const createOtp = async (req, res) => {
+const createPlace = (req, res) => {
   try {
-    const { email, otp } = req.body;
-    if (!email || !otp) {
+    const {
+      name,
+      description,
+      addressString,
+      provinceId,
+      districtId } = req.body;
+    if (!name ||
+      !description ||
+      !addressString ||
+      !provinceId ||
+      !districtId) {
       return res.status(200).json({
-        status: "ERR",
+        status: "error",
         message: "The input is required",
+        data: {}
       });
     }
-    const response = await OtpService.createOtp(req.body);
-    return res.status(200).json(response);
+    PlaceService.createPlace(req.body)
+      .then(response => {
+        return res.status(200).json({
+          status: "OK",
+          message: "Success",
+          data: response
+        })
+      })
+      .catch(err => {
+        return res.status(500).json({
+          message: err,
+        });
+      })
   } catch (e) {
-    return res.status(404).json({
+    return res.status(500).json({
       message: e,
     });
   }
 };
 
-const deleteOtp = async (req, res) => {
+const updatePlace = (req, res) => {
   try {
-    const { otp } = req.body;
-    if (!otp) {
+    const id = req.params.id || null
+    const {
+      name,
+      description,
+      addressString,
+      provinceId,
+      districtId } = req.body;
+    if (!name ||
+      !description ||
+      !addressString ||
+      !provinceId ||
+      !districtId || !id) {
       return res.status(200).json({
-        status: "ERR",
-        message: "The userId is required",
+        status: "error",
+        message: "The input is required",
+        data: {}
       });
     }
-    const response = await OtpService.deleteOtp(req.body);
-    return res.status(200).json(response);
+    PlaceService.updatePlace(id, req.body)
+      .then(response => {
+        return res.status(200).json({
+          status: "OK",
+          message: "Success",
+          data: response
+        })
+      })
+      .catch(err => {
+        return res.status(500).json({
+          message: err,
+        });
+      })
   } catch (e) {
-    return res.status(404).json({
+    return res.status(500).json({
       message: e,
     });
   }
 };
+const deletePlace = (req, res) => {
+  try {
+    const id = req.params.id || null
 
+    if (!id) {
+      return res.status(200).json({
+        status: "error",
+        message: "The input is required",
+        data: {}
+      });
+    }
+    PlaceService.deletePlace(id,)
+      .then(response => {
+        return res.status(200).json({
+          status: "OK",
+          message: "Success",
+          data: response
+        })
+      })
+      .catch(err => {
+        return res.status(404).json({
+          message: err,
+        });
+      })
+  } catch (e) {
+    return res.status(500).json({
+      message: e,
+    });
+  }
+};
 module.exports = {
-  createOtp,
-  deleteOtp,
+  createPlace,
+  updatePlace,
+  deletePlace
 };

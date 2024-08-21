@@ -2,7 +2,9 @@ const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 dotenv.config();
 const authMiddleWare = (req, res, next) => {
-  const token = req.headers?.token?.split(" ")[1];
+  const token = getTokenInHeader(req.headers) || null
+  console.log(token);
+
   jwt.verify(token, process.env.ACCESS_TOKEN, function (err, user) {
     if (err) {
       return res.status(404).json({
@@ -23,7 +25,7 @@ const authMiddleWare = (req, res, next) => {
 
 const authUserMiddleWare = (req, res, next) => {
   //Cho user bình thường có thể xem được trang cá nhân của mình
-  const token = req.headers?.token?.split(" ")[1];
+  const token = getTokenInHeader(req.headers) || null
   const userId = req.params.id;
 
   jwt.verify(token, process.env.ACCESS_TOKEN, function (err, user) {
@@ -44,5 +46,7 @@ const authUserMiddleWare = (req, res, next) => {
     }
   });
 };
-
+function getTokenInHeader(header) {
+  return header.cookie.split('=')[1]
+}
 module.exports = { authMiddleWare, authUserMiddleWare };

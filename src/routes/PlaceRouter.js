@@ -6,4 +6,8 @@ const {
   authMiddleWare,
 } = require("../MiddleWare/authMiddleWare");
 
+router.post('/', authMiddleWare, placeController.createPlace)
+router.put('/:id', authMiddleWare, placeController.updatePlace)
+router.delete('/:id', authMiddleWare, placeController.deletePlace)
+
 module.exports = router;

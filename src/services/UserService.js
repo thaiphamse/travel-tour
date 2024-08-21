@@ -64,12 +64,16 @@ const loginUser = (userLogin) => {
         id: checkUser.id,
         isAdmin: checkUser.isAdmin,
       });
-
+      await User.findOneAndUpdate({
+        email: email,
+      }, {
+        refresh_token: refresh_token
+      });
       resolve({
         status: "OK",
         message: "success",
         access_token,
-        refresh_token,
+        // refresh_token
       });
     } catch (e) {
       reject(e);
@@ -85,7 +89,7 @@ const updateUser = (id, data) => {
       });
       if (checkUser === null) {
         resolve({
-          status: "OK",
+          status: "error",
           message: "The user is not defined",
         });
       } else {

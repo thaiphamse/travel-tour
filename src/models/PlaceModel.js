@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const placeSchema = new mongoose.Schema(
   {
-    name: { type: String },
+    name: { type: String, required: true },
     description: [{ type: Object, required: true }],
     addressString: {
       type: String,

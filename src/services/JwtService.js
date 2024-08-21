@@ -30,7 +30,7 @@ const refreshTokenService = (token) => {
         if (err) {
           resolve({
             status: "ERR",
-            message: "The authentication",
+            message: err,
           });
         }
 
