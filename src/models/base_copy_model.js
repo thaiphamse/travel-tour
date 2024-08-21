@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const OtpSchema = new mongoose.Schema(
+const placeSchema = new mongoose.Schema(
   {
     email: { type: String },
     otp: { type: String },
@@ -9,5 +9,5 @@ const OtpSchema = new mongoose.Schema(
   }
 );
 
-const Otp = mongoose.model("Otp", OtpSchema);
-module.exports = Otp;
+// const place = mongoose.model("Place", placeSchema);
+// module.exports = place;

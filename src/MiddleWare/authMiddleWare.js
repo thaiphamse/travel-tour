@@ -23,7 +23,7 @@ const authMiddleWare = (req, res, next) => {
 
 const authUserMiddleWare = (req, res, next) => {
   //Cho user bình thường có thể xem được trang cá nhân của mình
-  const token = req.headers.token.split(" ")[1];
+  const token = req.headers?.token?.split(" ")[1];
   const userId = req.params.id;
 
   jwt.verify(token, process.env.ACCESS_TOKEN, function (err, user) {

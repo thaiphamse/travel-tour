@@ -1,4 +1,4 @@
-const OtpService = require("../services/OtpService");
+const PlaceService = require("../services/PlaceService");
 const JwtService = require("../services/JwtService");
 
 const createOtp = async (req, res) => {
