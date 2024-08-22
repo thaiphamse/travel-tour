@@ -2,14 +2,14 @@ const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 dotenv.config();
 const authMiddleWare = (req, res, next) => {
-  const token = getTokenInHeader(req.headers) || null
-  console.log(token);
+  const token = req.headers?.authorization?.split("Bearer ")[1];
+  console.log(req.headers);
 
   jwt.verify(token, process.env.ACCESS_TOKEN, function (err, user) {
     if (err) {
       return res.status(404).json({
         message: "the authentication",
-        status: "ERROR",
+        status: err,
       });
     }
     if (user?.isAdmin) {
@@ -25,14 +25,14 @@ const authMiddleWare = (req, res, next) => {
 
 const authUserMiddleWare = (req, res, next) => {
   //Cho user bình thường có thể xem được trang cá nhân của mình
-  const token = getTokenInHeader(req.headers) || null
+  const token = req.headers?.authorization?.split("Bear ")[1];
   const userId = req.params.id;
 
   jwt.verify(token, process.env.ACCESS_TOKEN, function (err, user) {
     if (err) {
       return res.status(404).json({
         message: "the authentication",
-        status: "ERROR",
+        status: err,
       });
     }
     // const { payload } = user;
@@ -47,6 +47,6 @@ const authUserMiddleWare = (req, res, next) => {
   });
 };
 function getTokenInHeader(header) {
-  return header.cookie.split('=')[1]
+  return header.cookie?.split('=')[1]
 }
 module.exports = { authMiddleWare, authUserMiddleWare };

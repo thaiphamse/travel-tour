@@ -86,6 +86,23 @@ const deletePlace = (id) => {
         }
     })
 }
+const getAllPlace = (id, query) => {
+    return new Promise(async (resolve, reject) => {
+
+        try {
+
+            if (!deletePlace)
+                reject({
+                    status: "error",
+                    message: "Not found",
+                })
+            resolve(deletePlace)
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
 module.exports = {
     createPlace,
     updatePlace,

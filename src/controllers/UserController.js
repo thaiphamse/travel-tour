@@ -56,8 +56,8 @@ const loginUser = async (req, res) => {
     }
     const response = await UserService.loginUser(req.body);
     console.log(response)
-    const { access_token, ...newResponse } = response;
-    res.cookie("access_token", access_token, {
+    const { access_token, refresh_token, ...newResponse } = response;
+    res.cookie("refresh_token", refresh_token, {
       httpOnly: true,
       secure: true, //thêm bảo mật phía client
       sameSite: "Lax",
@@ -175,13 +175,13 @@ const getDetailUser = async (req, res) => {
 
 const refreshToken = async (req, res) => {
   try {
-    let token = req.headers.cookie.split('=')[1]
+    const token = req.headers?.cookie?.split("=")[1];
     console.log(token)
     // const token = req.cookies.refresh_token;
     if (!token) {
       return res.status(200).json({
         status: "ERR",
-        message: "The userId is required",
+        message: "Not provide token",
       });
     }
     const response = await JwtService.refreshTokenService(token);
