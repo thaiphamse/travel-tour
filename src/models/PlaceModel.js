@@ -29,7 +29,12 @@ const placeSchema = new mongoose.Schema(
         type: [Number], // Mảng lưu kinh độ và vĩ độ [longitude, latitude]
         // required: true
       }
-    }
+    },
+    timelines: [{
+      date: mongoose.Schema.Types.Date,
+      detail: String,
+    }],
+    foods: [{ type: mongoose.Schema.Types.ObjectId }]
   },
   {
     timestamps: true,

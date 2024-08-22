@@ -109,8 +109,50 @@ const deletePlace = (req, res) => {
     });
   }
 };
+const getAllPlace = (req, res) => {
+  try {
+    const id = req.params.id || null
+    const query = req.query || null
+
+    PlaceService.getAllPlace({ id, query })
+      .then(response => {
+        return res.status(200).json(response)
+      })
+      .catch(err => {
+        return res.status(404).json({
+          message: err,
+        });
+      })
+  } catch (e) {
+    return res.status(500).json({
+      status: "error",
+      message: e,
+    });
+  }
+};
+const getOnePlace = (req, res) => {
+  try {
+    const idPlace = req.query.id || null
+    if (!idPlace) {
+      return res.status(200).json({
+        status: "error",
+        message: "The input is required",
+        data: {}
+      });
+    }
+    PlaceService.getOnePlace(idPlace)
+      .then(response => {
+        res.status(200).json(response)
+      })
+      .catch(err => res.status(500).json(err))
+  } catch (error) {
+
+  }
+}
 module.exports = {
   createPlace,
   updatePlace,
-  deletePlace
+  deletePlace,
+  getAllPlace,
+  getOnePlace
 };
