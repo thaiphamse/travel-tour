@@ -4,9 +4,13 @@ const userSchema = new mongoose.Schema(
     name: { type: String },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    isAdmin: { type: Boolean, default: false, required: true },
+    role: {
+      type: String,
+      enum: ['admin', 'employee'],
+      default: 'employee',
+      required: true
+    },
     phone: { type: Number },
-    refresh_token: { type: String, require: true },
     address: { type: String },
     avatar: { type: String },
     city: { type: String },

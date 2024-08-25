@@ -3,7 +3,6 @@ const dotenv = require("dotenv");
 dotenv.config();
 const authMiddleWare = (req, res, next) => {
   const token = req.headers?.authorization?.split("Bearer ")[1];
-  console.log(req.headers);
 
   jwt.verify(token, process.env.ACCESS_TOKEN, function (err, user) {
     if (err) {
@@ -12,7 +11,8 @@ const authMiddleWare = (req, res, next) => {
         status: err,
       });
     }
-    if (user?.isAdmin) {
+    console.log(user)
+    if (user?.role === 'admin') {
       next();
     } else {
       return res.status(404).json({
@@ -36,7 +36,7 @@ const authUserMiddleWare = (req, res, next) => {
       });
     }
     // const { payload } = user;
-    if (user?.isAdmin || user?.id === userId) {
+    if (user?.role === 'admin' || user?.id === userId) {
       next();
     } else {
       return res.status(404).json({
@@ -46,7 +46,5 @@ const authUserMiddleWare = (req, res, next) => {
     }
   });
 };
-function getTokenInHeader(header) {
-  return header.cookie?.split('=')[1]
-}
+
 module.exports = { authMiddleWare, authUserMiddleWare };

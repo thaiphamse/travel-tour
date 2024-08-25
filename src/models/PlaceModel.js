@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 const placeSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
+    name: { type: String, required: true, index: true },
+    title: { type: String, required: true },
     description: [{ type: Object, required: true }],
     addressString: {
       type: String,
@@ -10,31 +11,7 @@ const placeSchema = new mongoose.Schema(
     provinceId: {
       type: Number,
       required: true
-    },
-    districtId: {
-      type: Number,
-      required: true
-    },
-    wardId: {
-      type: Number,
-      // required: true
-    },
-    location: {
-      type: {
-        type: String,
-        enum: ['Point'], // Loại hình tọa độ, phải là "Point"
-        // required: true
-      },
-      coordinates: {
-        type: [Number], // Mảng lưu kinh độ và vĩ độ [longitude, latitude]
-        // required: true
-      }
-    },
-    timelines: [{
-      date: mongoose.Schema.Types.Date,
-      detail: String,
-    }],
-    foods: [{ type: mongoose.Schema.Types.ObjectId }]
+    }
   },
   {
     timestamps: true,

@@ -14,6 +14,12 @@ const createUser = (newUser) => {
           message: "The email is already",
         });
       }
+      if (!(password === confirmPassword)) {
+        resolve({
+          status: "ERR",
+          message: "The password is not equal",
+        });
+      }
       const hashPassword = bcrypt.hashSync(password, 10);
       const createUser = await User.create({
         name,
@@ -58,11 +64,11 @@ const loginUser = (userLogin) => {
 
       const access_token = await genneralAccessToken({
         id: checkUser.id,
-        isAdmin: checkUser.isAdmin,
+        role: checkUser.role,
       });
       const refresh_token = await genneralRefreshToken({
         id: checkUser.id,
-        isAdmin: checkUser.isAdmin,
+        role: checkUser.role,
       });
 
       resolve({
