@@ -1,27 +1,21 @@
-const PlaceService = require("../services/PlaceService");
-const JwtService = require("../services/JwtService");
 
-const createPlace = (req, res) => {
+const foodService = require("../services/FoodService");
+
+const createFood = (req, res) => {
   try {
     const {
       name,
       title,
       description,
-      addressString,
-      provinceId,
-      districtId } = req.body;
-    if (!name ||
-      !description ||
-      !addressString ||
-      !provinceId ||
-      !districtId) {
+    } = req.body;
+    if (!name || !title || !description) {
       return res.status(200).json({
         status: "ERROR",
         message: "The input is required",
         data: {}
       });
     }
-    PlaceService.createPlace(req.body)
+    foodService.createFood(req.body)
       .then(response => {
         return res.status(200).json({
           status: "OK",
@@ -43,28 +37,23 @@ const createPlace = (req, res) => {
   }
 };
 
-const updatePlace = (req, res) => {
+const updateFood = (req, res) => {
   try {
     const id = req.params.id || null
     const {
       name,
       title,
-      description,
-      addressString,
-      provinceId,
-      districtId } = req.body;
+      description } = req.body
     if (!name || !title ||
       !description ||
-      !addressString ||
-      !provinceId ||
-      !districtId || !id) {
+      !id) {
       return res.status(200).json({
-        status: "error",
+        status: "ERROR",
         message: "The input is required",
         data: {}
       });
     }
-    PlaceService.updatePlace(id, req.body)
+    foodService.updateFood(id, req.body)
       .then(response => {
         return res.status(200).json({
           status: "OK",
@@ -74,16 +63,16 @@ const updatePlace = (req, res) => {
       })
       .catch(err => {
         return res.status(500).json({
-          message: err,
+          message: err.message,
         });
       })
   } catch (e) {
     return res.status(500).json({
-      message: e,
+      message: e.message,
     });
   }
 };
-const deletePlace = (req, res) => {
+const deleteFood = (req, res) => {
   try {
     const id = req.params.id || null
 
@@ -94,7 +83,7 @@ const deletePlace = (req, res) => {
         data: {}
       });
     }
-    PlaceService.deletePlace(id,)
+    foodService.deleteFood(id)
       .then(response => {
         return res.status(200).json({
           status: "OK",
@@ -113,12 +102,12 @@ const deletePlace = (req, res) => {
     });
   }
 };
-const getAllPlace = (req, res) => {
+const getAllFood = (req, res) => {
   try {
     const id = req.params.id || null
     const query = req.query || null
 
-    PlaceService.getAllPlace({ id, query })
+    foodService.getAllFood({ id, query })
       .then(response => {
         return res.status(200).json(response)
       })
@@ -154,9 +143,9 @@ const getOnePlace = (req, res) => {
   }
 }
 module.exports = {
-  createPlace,
-  updatePlace,
-  deletePlace,
-  getAllPlace,
-  getOnePlace
+  createFood,
+  updateFood,
+  deleteFood,
+  getAllFood,
+  // getOnePlace
 };

@@ -55,7 +55,7 @@ const loginUser = async (req, res) => {
       });
     }
     const response = await UserService.loginUser(req.body);
-    console.log(response)
+    // console.log(response)
     const { access_token, refresh_token, ...newResponse } = response;
     res.cookie("refresh_token", refresh_token, {
       httpOnly: true,
@@ -74,6 +74,7 @@ const loginUser = async (req, res) => {
 
 const logoutUser = async (req, res) => {
   try {
+    // res.removeHeader('token')
     res.clearCookie("refresh_token");
     return res.status(200).json({
       status: " OK",

@@ -46,7 +46,7 @@ const loginUser = (userLogin) => {
     try {
       const checkUser = await User.findOne({
         email: email,
-      });
+      }).select('+password');
       if (checkUser === null) {
         resolve({
           status: "ERR",

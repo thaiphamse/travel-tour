@@ -1,99 +1,86 @@
-const placeModel = require("../models/PlaceModel");
+const foodModel = require("../models/FoodModel");
 // CRUD
-const createPlace = (newPlace) => {
+const createFood = (newFood) => {
     return new Promise(async (resolve, reject) => {
         const {
             name,
             title,
             description,
-            addressString,
-            provinceId,
-            districtId,
-            wardId,
-            location } = newPlace
+        } = newFood
         try {
-            let newPlace = await placeModel.create({
+            let newFoodCreated = await foodModel.create({
                 name,
                 title,
-                description,
-                addressString,
-                provinceId,
-                districtId,
-                wardId,
-                location
+                description
             })
-            if (!newPlace)
-                reject({
-                    status: "OK",
-                    message: "error",
-                })
-            resolve(newPlace)
-        } catch (error) {
-            reject(error)
-        }
-    })
-}
-
-const updatePlace = (id, newPlaceData) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            let updatePlace = await placeModel.findOneAndUpdate({ _id: id }, newPlaceData, { new: true })
-            if (!updatePlace)
+            if (!newFoodCreated)
                 reject({
                     status: "ERROR",
                     message: "error",
                 })
-            resolve(updatePlace)
+            resolve(newFoodCreated)
         } catch (error) {
             reject(error)
         }
     })
 }
-const deletePlace = (id) => {
+
+const updateFood = (id, updateData) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let updateFood = await foodModel.findOneAndUpdate({ _id: id }, updateData, { new: true })
+            if (!updateFood)
+                reject({
+                    status: "ERROR",
+                    message: "error",
+                })
+            resolve(updateFood)
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
+const deleteFood = (id) => {
     return new Promise(async (resolve, reject) => {
 
         try {
-            let deletePlace = await placeModel.findByIdAndRemove(id, { new: true })
-            if (!deletePlace)
+            let deleteFood = await foodModel.findByIdAndRemove(id, { new: true })
+
+            if (!deleteFood)
                 reject({
-                    status: "OK",
+                    status: "ERROR",
                     message: "Not found",
                 })
-            resolve(deletePlace)
+            resolve(deleteFood)
         } catch (error) {
             reject(error.message)
         }
     })
 }
-const getAllPlace = ({ id, query }) => {
+const getAllFood = ({ id, query }) => {
     return new Promise(async (resolve, reject) => {
         const page = query.page || 1
         const limit = query.limit || 10
         const sort = query.sort || "desc"
         const sortBy = query.sortBy || "createdAt"
-        const provinceId = Number(query.provinceId) || null;
         const name = query.name || null
         const filter = {}
         const skip = (page - 1) * limit;
-        // Lọc theo id tỉnh
-        if (provinceId) {
-            filter.provinceId = provinceId
-        }
-
         // Lọc theo tên
         if (name)
             filter.name = { $regex: name, $options: 'i' }; //Optione i Không phân biệt chữ hoa chữ thường để khớp với chữ hoa và chữ thường
 
         try {
-            let total = await placeModel.count()
+            let total = await foodModel.count()
             total = Math.ceil(total / limit)
-            let places = await placeModel.find(filter)
+
+            let foods = await foodModel.find(filter)
                 .sort({ sortBy: sort })
                 .limit(limit)
                 .skip(skip)
 
-            console.log(places)
-            if (places.length == 0)
+            if (length.length == 0)
                 reject({
                     status: "OK",
                     message: "NOT FOUND",
@@ -105,7 +92,7 @@ const getAllPlace = ({ id, query }) => {
                 totalPage: total,
                 sortBy,
                 sort,
-                data: places
+                data: foods
             })
         } catch (error) {
             reject(error.message)
@@ -117,7 +104,7 @@ const getOnePlace = (id) => {
         const filter = { _id: id }
 
         try {
-            let place = await placeModel.findOne(filter)
+            let place = await foodModel.findOne(filter)
             if (!place) {
                 reject({
                     status: "OK",
@@ -139,9 +126,9 @@ const getOnePlace = (id) => {
     })
 }
 module.exports = {
-    createPlace,
-    updatePlace,
-    deletePlace,
+    createFood,
+    updateFood,
+    deleteFood,
     getOnePlace,
-    getAllPlace,
+    getAllFood,
 };

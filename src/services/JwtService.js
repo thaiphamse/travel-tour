@@ -36,7 +36,7 @@ const refreshTokenService = (token) => {
 
         const access_token = await genneralAccessToken({
           id: user?.id,
-          isAdmin: user?.isAdmin,
+          role: user?.role,
         });
 
         resolve({
