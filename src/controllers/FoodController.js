@@ -123,17 +123,18 @@ const getAllFood = (req, res) => {
     });
   }
 };
-const getOnePlace = (req, res) => {
+const getOneFood = (req, res) => {
   try {
-    const idPlace = req.query.id || null
-    if (!idPlace) {
+    const idFood = req.params.id || null
+    console.log(idFood)
+    if (!idFood) {
       return res.status(200).json({
         status: "error",
         message: "The input is required",
         data: {}
       });
     }
-    PlaceService.getOnePlace(idPlace)
+    foodService.getOneFood(idFood)
       .then(response => {
         res.status(200).json(response)
       })
@@ -147,5 +148,5 @@ module.exports = {
   updateFood,
   deleteFood,
   getAllFood,
-  // getOnePlace
+  getOneFood
 };

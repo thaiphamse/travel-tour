@@ -6,7 +6,9 @@ const {
     authMiddleWare,
 } = require("../MiddleWare/authMiddleWare");
 
+router.get('/:id', foodController.getOneFood)
 router.get('/', foodController.getAllFood)
+
 router.post('/', authMiddleWare, foodController.createFood)
 router.put('/:id', authMiddleWare, foodController.updateFood)
 router.delete('/:id', authMiddleWare, foodController.deleteFood)

@@ -86,7 +86,7 @@ const getAllPlace = ({ id, query }) => {
 
         try {
             let total = await placeModel.count()
-            total = Math.ceil(total / limit)
+            let totalPage = Math.ceil(total / limit)
             let places = await placeModel.find(filter)
                 .sort({ sortBy: sort })
                 .limit(limit)
@@ -101,8 +101,8 @@ const getAllPlace = ({ id, query }) => {
             resolve({
                 status: "OK",
                 message: "Success",
-                currentPage: page,
-                totalPage: total,
+                currentPage: parseInt(page),
+                totalPage,
                 sortBy,
                 sort,
                 data: places
@@ -115,7 +115,7 @@ const getAllPlace = ({ id, query }) => {
 const getOnePlace = (id) => {
     return new Promise(async (resolve, reject) => {
         const filter = { _id: id }
-
+        console.log(filter)
         try {
             let place = await placeModel.findOne(filter)
             if (!place) {

@@ -7,7 +7,7 @@ const {
 } = require("../MiddleWare/authMiddleWare");
 
 router.get('/', placeController.getAllPlace)
-router.get('/detail', placeController.getOnePlace)
+router.get('/:id', placeController.getOnePlace)
 router.post('/', authMiddleWare, placeController.createPlace)
 router.put('/:id', authMiddleWare, placeController.updatePlace)
 router.delete('/:id', authMiddleWare, placeController.deletePlace)

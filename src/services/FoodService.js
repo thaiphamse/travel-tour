@@ -99,7 +99,7 @@ const getAllFood = ({ id, query }) => {
         }
     })
 }
-const getOnePlace = (id) => {
+const getOneFood = (id) => {
     return new Promise(async (resolve, reject) => {
         const filter = { _id: id }
 
@@ -129,6 +129,6 @@ module.exports = {
     createFood,
     updateFood,
     deleteFood,
-    getOnePlace,
+    getOneFood,
     getAllFood,
 };

@@ -136,7 +136,7 @@ const getAllPlace = (req, res) => {
 };
 const getOnePlace = (req, res) => {
   try {
-    const idPlace = req.query.id || null
+    const idPlace = req.params.id || null
     if (!idPlace) {
       return res.status(200).json({
         status: "error",
