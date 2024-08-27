@@ -3,7 +3,9 @@ const foodSchema = new mongoose.Schema(
   {
     name: { type: String, index: true },
     title: { type: String, required: true },
-    description: [{ type: Object }],
+    description: [
+      { type: Object }
+    ],
   },
   {
     timestamps: true,
