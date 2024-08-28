@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const foodModel = require("../models/FoodModel");
 // CRUD
 const createFood = (newFood) => {
@@ -45,7 +46,13 @@ const deleteFood = (id) => {
     return new Promise(async (resolve, reject) => {
 
         try {
-            let deleteFood = await foodModel.findByIdAndRemove(id, { new: true })
+            const validId = mongoose.Types.ObjectId.isValid(id) ? new mongoose.Types.ObjectId(id) : null;
+            if (!validId) {
+                const error = new Error("Invalid ID format");
+                error.status = "ERROR";
+                throw error;
+            }
+            let deleteFood = await foodModel.findByIdAndRemove(validId, { new: true })
 
             if (!deleteFood)
                 reject({
@@ -72,7 +79,7 @@ const getAllFood = ({ id, query }) => {
             filter.name = { $regex: name, $options: 'i' }; //Optione i Không phân biệt chữ hoa chữ thường để khớp với chữ hoa và chữ thường
 
         try {
-            let total = await foodModel.count()
+            let total = await foodModel.count(filter)
             total = Math.ceil(total / limit)
 
             let foods = await foodModel.find(filter)
@@ -92,6 +99,7 @@ const getAllFood = ({ id, query }) => {
                 totalPage: total,
                 sortBy,
                 sort,
+                countThisPage: foods.length,
                 data: foods
             })
         } catch (error) {

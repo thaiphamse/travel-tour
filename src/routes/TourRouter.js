@@ -6,10 +6,10 @@ const {
     authMiddleWare,
 } = require("../MiddleWare/authMiddleWare");
 
-router.get('/', tourController.createTour)
-// router.get('/:id', tourController)
+router.get('/', tourController.getAllTour)
+router.get('/:id', tourController.getOneTour)
 router.post('/', authMiddleWare, tourController.createTour)
-// router.put('/:id', authMiddleWare, tourController)
-// router.delete('/:id', authMiddleWare, tourController)
+router.put('/:id', authMiddleWare, tourController.updateOneTour)
+router.delete('/:id', authMiddleWare, tourController.deleteOneTour)
 
 module.exports = router;

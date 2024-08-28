@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const placeModel = require("../models/PlaceModel");
 // CRUD
 const createPlace = (newPlace) => {
@@ -53,7 +54,13 @@ const deletePlace = (id) => {
     return new Promise(async (resolve, reject) => {
 
         try {
-            let deletePlace = await placeModel.findByIdAndRemove(id, { new: true })
+            const validId = mongoose.Types.ObjectId.isValid(id) ? new mongoose.Types.ObjectId(id) : null;
+            if (!validId) {
+                const error = new Error("Invalid ID format");
+                error.status = "ERROR";
+                throw error;
+            }
+            let deletePlace = await placeModel.findByIdAndRemove(validId, { new: true })
             if (!deletePlace)
                 reject({
                     status: "OK",
@@ -85,14 +92,13 @@ const getAllPlace = ({ id, query }) => {
             filter.name = { $regex: name, $options: 'i' }; //Optione i Không phân biệt chữ hoa chữ thường để khớp với chữ hoa và chữ thường
 
         try {
-            let total = await placeModel.count()
+            let total = await placeModel.count(filter)
             let totalPage = Math.ceil(total / limit)
             let places = await placeModel.find(filter)
                 .sort({ sortBy: sort })
                 .limit(limit)
                 .skip(skip)
 
-            console.log(places)
             if (places.length == 0)
                 reject({
                     status: "OK",
@@ -105,6 +111,7 @@ const getAllPlace = ({ id, query }) => {
                 totalPage,
                 sortBy,
                 sort,
+                countThisPage: places.length,
                 data: places
             })
         } catch (error) {
