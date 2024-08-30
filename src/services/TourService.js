@@ -13,7 +13,7 @@ const createTour = async (tourData) => {
         start_date,
         end_date,
         hodel_level,
-        schedules } = tourData
+        schedules, image } = tourData
 
     if (!tour_code ||
         !name ||
@@ -50,7 +50,8 @@ const createTour = async (tourData) => {
         start_date,
         end_date,
         hodel_level,
-        schedules
+        schedules,
+        image
     })
 }
 const getAllTour = async (query) => {

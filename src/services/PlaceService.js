@@ -11,7 +11,7 @@ const createPlace = (newPlace) => {
             provinceId,
             districtId,
             wardId,
-            location } = newPlace
+            location, image } = newPlace
         try {
             let newPlace = await placeModel.create({
                 name,
@@ -21,7 +21,7 @@ const createPlace = (newPlace) => {
                 provinceId,
                 districtId,
                 wardId,
-                location
+                location, image
             })
             if (!newPlace)
                 reject({

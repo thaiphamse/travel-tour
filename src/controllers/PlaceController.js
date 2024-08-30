@@ -5,7 +5,6 @@ const createPlace = (req, res) => {
   try {
     const {
       name,
-      title,
       description,
       addressString,
       provinceId,

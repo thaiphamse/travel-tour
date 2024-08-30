@@ -7,12 +7,14 @@ const createFood = (newFood) => {
             name,
             title,
             description,
+            image
         } = newFood
         try {
             let newFoodCreated = await foodModel.create({
                 name,
                 title,
-                description
+                description,
+                image
             })
             if (!newFoodCreated)
                 reject({

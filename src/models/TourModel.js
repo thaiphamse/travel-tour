@@ -6,6 +6,13 @@ const TourSchema = new mongoose.Schema(
       unique: [true, "tour_code is an unique value"],
       required: [true, 'tour_code is required']
     },
+    image: [{
+      url: String,
+      type: {
+        type: String,
+        enum: ["banner", "photos"]
+      }
+    }],
     name: { type: String, required: true },
     description: [{ type: Object }],
     shedule_on_week: { type: String },
@@ -13,12 +20,12 @@ const TourSchema = new mongoose.Schema(
     end_location: { type: String, required: true },
     transportation: { type: String, enum: ['plane', 'car'], default: 'car', required: true },
     base_price_adult: {
-      type: mongoose.Schema.Types.Decimal128,
+      type: Number,
       required: [true, "base_price_adult is a required value"],
       default: 0.00
     },
     base_price_child: {
-      type: mongoose.Schema.Types.Decimal128,
+      type: Number,
       required: [true, "base_price_child is a required value"],
       default: 0.00
     },

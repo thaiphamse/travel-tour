@@ -200,7 +200,7 @@ const updatePassword = async (req, res) => {
     if (!email || !password) {
       return res.status(200).json({
         status: "ERR",
-        message: "The userId is required",
+        message: "The input is required",
       });
     }
     const response = await UserService.updatePassword(req.body);

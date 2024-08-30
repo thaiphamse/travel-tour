@@ -6,6 +6,13 @@ const foodSchema = new mongoose.Schema(
     description: [
       { type: Object }
     ],
+    image: [{
+      url: String,
+      type: {
+        type: String,
+        enum: ["banner", "photos"]
+      }
+    }],
   },
   {
     timestamps: true,

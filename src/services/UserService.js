@@ -188,7 +188,7 @@ const getDetailUser = (id) => {
       }
       resolve({
         status: "OK",
-        message: "success",
+        message: "SUCCESS",
         data: user,
       });
     } catch (e) {
