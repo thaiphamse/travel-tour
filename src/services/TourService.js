@@ -128,7 +128,7 @@ const getOneTour = async (params) => {
 }
 const deleteOneTour = async (id) => {
     try {
-        console.log(new mongoose.Types.ObjectId(id))
+
         if (!id) {
             const error = new Error("The input in required");
             error.status = "ERROR"

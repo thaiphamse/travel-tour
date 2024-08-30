@@ -15,10 +15,6 @@ const placeSchema = new mongoose.Schema(
       type: String,
       required: true
     },
-    provinceId: {
-      type: Number,
-      required: true
-    }
   },
   {
     timestamps: true,

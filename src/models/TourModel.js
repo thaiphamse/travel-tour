@@ -1,3 +1,4 @@
+const moment = require("moment/moment");
 const mongoose = require("mongoose");
 const TourSchema = new mongoose.Schema(
   {
@@ -29,13 +30,21 @@ const TourSchema = new mongoose.Schema(
       required: [true, "base_price_child is a required value"],
       default: 0.00
     },
-    start_date: { type: Date, required: true },
-    end_date: { type: Date, required: true },
-    hodel_level: [
+    start_date: {
+      type: String,
+      required: true,
+
+    },
+    end_date: {
+      type: String,
+      required: true,
+
+    },
+    hotel_level: [
       {
-        star: { type: Number, required: true },
-        price_adult: { type: String, required: true },
-        price_child: { type: String, required: true },
+        star: { type: Number, required: true, unique: true },
+        price_adult: { type: String, required: true, default: 0 },
+        price_child: { type: String, required: true, default: 0 },
       },
     ],
     schedules: [
