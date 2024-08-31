@@ -33,11 +33,34 @@ const updatePaymentInfo = async (req, res, next) => {
             data: tour
         })
     } catch (error) {
+        console.log(error)
+
+        next(error)
+    }
+}
+const getBookings = async (req, res, next) => {
+    try {
+        let bookingResponse = await bookingService.getBookings(req.query)
+        return res.status(200).json({
+            status: "OK",
+            message: "SUCCESS",
+            total: bookingResponse.total,
+            currentPage: bookingResponse.currentPage,
+            totalPage: bookingResponse.totalPage,
+            sortBy: bookingResponse.sortBy,
+            sort: bookingResponse.sort,
+            limit: parseInt(bookingResponse.limit),
+            countThisPage: bookingResponse.booking.length,
+            data: bookingResponse.booking
+        })
+    } catch (error) {
+        console.log(error)
         next(error)
     }
 }
 module.exports = {
     createBooking,
     getBookDetail,
-    updatePaymentInfo
+    updatePaymentInfo,
+    getBookings
 }

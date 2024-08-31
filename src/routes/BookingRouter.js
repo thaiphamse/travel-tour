@@ -7,7 +7,7 @@ const {
 } = require("../MiddleWare/authMiddleWare");
 
 router.get('/:id', bookingController.getBookDetail)
-// router.get('/', foodController.getAllFood)
+router.get('/', bookingController.getBookings)
 router.post('/', authMiddleWare, bookingController.createBooking)
 router.put('/:id', authMiddleWare, bookingController.updatePaymentInfo)
 // router.delete('/:id', authMiddleWare, foodController.deleteFood)

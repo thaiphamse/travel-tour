@@ -83,9 +83,13 @@ const updatePaymentInfo = async (params, data) => {
         error.status = "ERROR";
         throw error;
     }
-    const updateBooking = await bookingModel.findOneAndUpdate({
-        _id: id
-    }, { payment_status, payment_date: moment(new Date()).format('LLLL') }, { new: true })
+
+    const updateBooking = await bookingModel
+        .findOneAndUpdate(
+            { _id: id },
+            { payment_status, payment_date: moment(new Date()).format('LLLL') },
+            { new: true }
+        )
         .select('total_price payment_date payment_status payment_method_name')
 
     if (!updateBooking) {
@@ -103,11 +107,9 @@ const calculateTotalPrice = async ({ tour_id, hotel_level, adult_ticket, child_t
     if (!tour) {
         throw new Error('Tour not found');
     }
-
     // Tìm giá khách sạn
     let hotelInfo
     hotelInfo = tour.hotel_level.find(h => h.star == hotel_level);
-    console.log(hotelInfo)
 
     if (!hotelInfo) {
         hotelInfo = {}
@@ -121,10 +123,6 @@ const calculateTotalPrice = async ({ tour_id, hotel_level, adult_ticket, child_t
     const priceHotelAdult = parseFloat(hotelInfo.price_adult);
     const priceHotelChild = parseFloat(hotelInfo.price_child);
 
-    console.log(basePriceAdult,
-        basePriceChild,
-        priceHotelAdult,
-        priceHotelChild, child_ticket)
     const totalPrice =
         (basePriceAdult * adult_ticket) +
         (priceHotelAdult * adult_ticket) +
@@ -134,8 +132,47 @@ const calculateTotalPrice = async ({ tour_id, hotel_level, adult_ticket, child_t
     return totalPrice;
 };
 
+const getBookings = async (query) => {
+    const page = query.page || 1
+    const limit = query.limit || 10
+    const sort = query.sort || "desc"
+    const sortBy = query.sortBy || "createdAt"
+    const tour_code = (query.tour_code) || null;
+
+    const tour_name = query.tour_name || null
+    const filter = {}
+
+    const skip = (page - 1) * limit;
+    // Lọc theo tour code
+    if (tour_code) {
+        filter.tour_code = tour_code
+    }
+
+    //  Lọc theo tên tour
+    if (tour_name) {
+        filter.name = { $regex: tour_name, $options: 'i' };
+    }
+
+    let total = await bookingModel.find().populate({
+        path: 'tour_id', // Trường được liên kết với bảng Tour
+        match: filter, // Điều kiện lọc theo tour_code
+    }).count()
+    let totalPage = Math.ceil(total / limit)
+
+    const bookings = await bookingModel.find().populate({
+        path: 'tour_id', // Trường được liên kết với bảng Tour
+        match: filter, // Điều kiện lọc theo tour_code
+    })
+        .sort({ sortBy: sort })
+        .limit(limit)
+        .skip(skip);
+    const filteredBookings = bookings.filter(booking => booking.tour_id !== null);
+    return { booking: filteredBookings, sort, sortBy, totalPage, limit }
+
+}
 module.exports = {
     createBooking,
     getBookDetail,
-    updatePaymentInfo
+    updatePaymentInfo,
+    getBookings
 }
