@@ -67,11 +67,10 @@ const getBookDetail = async (params) => {
     bookingObject.hotel_info = hotelInfo
     return bookingObject
 }
-const updatePaymentInfo = async (params, data) => {
+const updateBooking = async (params, data) => {
     const id = params.id || null
-    const { payment_status } = data
 
-    if (!id || !payment_status) {
+    if (!id) {
         const error = new Error('The input in required!');
         error.status = "ERROR"
         error.statusCode = 400; // Bad Request
@@ -87,10 +86,9 @@ const updatePaymentInfo = async (params, data) => {
     const updateBooking = await bookingModel
         .findOneAndUpdate(
             { _id: id },
-            { payment_status, payment_date: moment(new Date()).format('LLLL') },
+            data,
             { new: true }
         )
-        .select('total_price payment_date payment_status payment_method_name')
 
     if (!updateBooking) {
         const error = new Error('Not found booking');
@@ -170,9 +168,49 @@ const getBookings = async (query) => {
     return { booking: filteredBookings, sort, sortBy, totalPage, limit }
 
 }
+const updatePaymentInfo = async (params, data) => {
+    const { transactionId } = data
+    const id = params.id || null
+    if (!id || !transactionId) {
+        const error = new Error('The input in required!');
+        error.status = "ERROR"
+        error.statusCode = 400; // Bad Request
+        throw error;
+    }
+    // check a valid id
+    const validId = mongoose.Types.ObjectId.isValid(id) ? new mongoose.Types.ObjectId(id) : null;
+    if (!validId) {
+        const error = new Error("Invalid ID format");
+        error.status = "ERROR";
+        throw error;
+    }
+
+    let bookingDb = await bookingModel.findOne({ _id: validId })
+
+    if (!bookingDb) {
+        const error = new Error('Booking not found');
+        error.status = "ERROR"
+        error.statusCode = 404; // Bad Request
+        throw error;
+    }
+    //update info
+    bookingDb.transactionId = transactionId
+    bookingDb.payment_status = "payment_confirmed"
+
+    let updated = await bookingDb.save()
+    if (!updated) {
+        const error = new Error("Somethings were wrong");
+        error.status = "ERROR";
+        error.statusCode = 500; // Bad Request
+        throw error;
+    }
+    return updated
+
+}
 module.exports = {
     createBooking,
     getBookDetail,
-    updatePaymentInfo,
-    getBookings
+    updateBooking,
+    getBookings,
+    updatePaymentInfo
 }

@@ -44,12 +44,10 @@ const updateFood = (req, res) => {
       name,
       title,
       description } = req.body
-    if (!name || !title ||
-      !description ||
-      !id) {
+    if (!id) {
       return res.status(200).json({
         status: "ERROR",
-        message: "The input is required",
+        message: "The id is required",
         data: {}
       });
     }

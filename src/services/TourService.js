@@ -155,22 +155,6 @@ const updateOneTour = async (params, body) => {
             end_date,
             schedules } = body
 
-        if (!tour_code ||
-            !name ||
-            !description ||
-            !shedule_on_week ||
-            !transportation ||
-            !start_location ||
-            !end_location ||
-            !start_date ||
-            !end_date || schedules.length === 0) {
-
-            const error = new Error('The input in required!');
-            error.status = "ERROR"
-            error.statusCode = 400; // Bad Request
-            throw error;
-        }
-
         const validId = mongoose.Types.ObjectId.isValid(id) ? new mongoose.Types.ObjectId(id) : null;
         if (!validId) {
             const error = new Error("Invalid ID format");

@@ -24,13 +24,13 @@ const getBookDetail = async (req, res, next) => {
         next(error)
     }
 }
-const updatePaymentInfo = async (req, res, next) => {
+const updateBooking = async (req, res, next) => {
     try {
-        let tour = await bookingService.updatePaymentInfo(req.params, req.body)
+        let rs = await bookingService.updateBooking(req.params, req.body)
         return res.status(200).json({
             status: "OK",
             message: "SUCCESS",
-            data: tour
+            data: rs
         })
     } catch (error) {
         console.log(error)
@@ -58,9 +58,24 @@ const getBookings = async (req, res, next) => {
         next(error)
     }
 }
+const updatePaymentInfo = async (req, res, next) => {
+    try {
+        let paymentInfo = await bookingService.updatePaymentInfo(req.params, req.body)
+        return res.status(200).json({
+            status: "OK",
+            message: "SUCCESS",
+            data: paymentInfo
+        })
+    } catch (error) {
+        console.log(error)
+
+        next(error)
+    }
+}
 module.exports = {
     createBooking,
     getBookDetail,
-    updatePaymentInfo,
-    getBookings
+    updateBooking,
+    getBookings,
+    updatePaymentInfo
 }

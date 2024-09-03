@@ -52,14 +52,10 @@ const updatePlace = (req, res) => {
       addressString,
       provinceId,
       districtId } = req.body;
-    if (!name || !title ||
-      !description ||
-      !addressString ||
-      !provinceId ||
-      !districtId || !id) {
+    if (!id) {
       return res.status(200).json({
         status: "error",
-        message: "The input is required",
+        message: "The id is required",
         data: {}
       });
     }
