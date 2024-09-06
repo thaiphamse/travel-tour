@@ -207,10 +207,47 @@ const updatePaymentInfo = async (params, data) => {
     return updated
 
 }
+const getMyBooking = async (query, body) => {
+    const page = query.page || 1
+    const limit = query.limit || 10
+    const sort = query.sort || "desc"
+    const sortBy = query.sortBy || "createdAt"
+    const email = body.email || null
+    const tour_name = query.tour_name || null
+    const filter = {}
+    const filterFind = {}
+    const skip = (page - 1) * limit;
+
+    // Lọc theo email khách hàng
+    if (email) {
+        filterFind.email = email
+    }
+    //  Lọc theo tên tour
+    if (tour_name) {
+        filter.name = { $regex: tour_name, $options: 'i' };
+    }
+
+    let total = await bookingModel.find().populate({
+        path: 'tour_id', // Trường được liên kết với bảng Tour
+        match: filter, // Điều kiện lọc theo tour_code
+    }).count()
+    let totalPage = Math.ceil(total / limit)
+
+    const bookings = await bookingModel.find(filterFind).populate({
+        path: 'tour_id', // Trường được liên kết với bảng Tour
+        match: filter, // Điều kiện lọc theo tour_code
+    })
+        .sort({ sortBy: sort })
+        .limit(limit)
+        .skip(skip);
+    const filteredBookings = bookings.filter(booking => booking.tour_id !== null);
+    return { booking: filteredBookings, sort, sortBy, totalPage, limit }
+}
 module.exports = {
     createBooking,
     getBookDetail,
     updateBooking,
     getBookings,
-    updatePaymentInfo
+    updatePaymentInfo,
+    getMyBooking
 }

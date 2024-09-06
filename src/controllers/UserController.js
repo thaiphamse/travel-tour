@@ -211,6 +211,7 @@ const updatePassword = async (req, res) => {
     });
   }
 };
+
 module.exports = {
   createUser,
   loginUser,
@@ -222,4 +223,5 @@ module.exports = {
   logoutUser,
   deleteMany,
   updatePassword,
+
 };

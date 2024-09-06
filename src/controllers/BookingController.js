@@ -72,10 +72,31 @@ const updatePaymentInfo = async (req, res, next) => {
         next(error)
     }
 }
+const getMyBooking = async (req, res, next) => {
+    try {
+        const bookings = await bookingService.getMyBooking(req.query, req.body)
+        return res.status(200).json({
+            status: "OK",
+            message: "SUCCESS",
+            total: bookings.total,
+            currentPage: bookings.currentPage,
+            totalPage: bookings.totalPage,
+            sortBy: bookings.sortBy,
+            sort: bookings.sort,
+            limit: parseInt(bookings.limit),
+            countThisPage: bookings.booking.length,
+            data: bookings.booking
+        })
+    } catch (e) {
+        console.error(e.message)
+        next(e)
+    }
+}
 module.exports = {
     createBooking,
     getBookDetail,
     updateBooking,
     getBookings,
-    updatePaymentInfo
+    updatePaymentInfo,
+    getMyBooking
 }

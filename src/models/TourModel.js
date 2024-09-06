@@ -55,6 +55,12 @@ const TourSchema = new mongoose.Schema(
           type: mongoose.Schema.Types.ObjectId, ref: 'Food'
         }]
       }
+    ],
+    comments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Comment'
+      }
     ]
   },
   {
