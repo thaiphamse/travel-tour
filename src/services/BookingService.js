@@ -59,6 +59,7 @@ const getBookDetail = async (params) => {
     if (!validId) {
         const error = new Error("Invalid ID format");
         error.status = "ERROR";
+        error.statusCode = 400
         throw error;
     }
     const booking = await bookingModel.findById(validId).populate('hotel_level tour_id')
@@ -80,6 +81,7 @@ const updateBooking = async (params, data) => {
     if (!validId) {
         const error = new Error("Invalid ID format");
         error.status = "ERROR";
+        error.statusCode = 400
         throw error;
     }
 
@@ -103,7 +105,10 @@ const calculateTotalPrice = async ({ tour_id, hotel_level, adult_ticket, child_t
     // Truy xuất tour
     const tour = await tourModel.findById(tour_id).exec();
     if (!tour) {
-        throw new Error('Tour not found');
+        error.message = "Tour not found"
+        error.status = "ERROR";
+        error.statusCode = 404
+        throw error;
     }
     // Tìm giá khách sạn
     let hotelInfo
@@ -182,6 +187,7 @@ const updatePaymentInfo = async (params, data) => {
     if (!validId) {
         const error = new Error("Invalid ID format");
         error.status = "ERROR";
+        error.statusCode = 400
         throw error;
     }
 

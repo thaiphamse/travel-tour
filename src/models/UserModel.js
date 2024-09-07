@@ -12,16 +12,13 @@ const userSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
-      set: function (value) {
-        // Biểu thức chính quy kiểm tra số điện thoại Việt Nam
-        const vietnamPhoneRegex = /^(03|05|07|08|09)\d{8}$/;
-        // Kiểm tra số điện thoại
-        if (!vietnamPhoneRegex.test(value)) {
-          throw new Error('Invalid phone number format for Vietnam');
-        }
-
-        // Trả về số điện thoại hợp lệ
-        return value;
+      validate: {
+        validator: function (value) {
+          // Regular expression for validating email format
+          const vietnamPhoneRegex = /^(03|05|07|08|09)\d{8}$/;
+          return vietnamPhoneRegex.test(value);
+        },
+        message: 'Invalid Viet Nam phone format'
       }
     },
     address: { type: String },

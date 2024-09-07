@@ -85,6 +85,7 @@ const getAllTour = async (query) => {
         if (tours.length === 0) {
             const error = new Error("Not found tour");
             error.status = "ERROR"
+            error.statusCode = 404
             throw error;
         }
         return {
@@ -110,6 +111,7 @@ const getOneTour = async (params) => {
         if (!id) {
             const error = new Error("The input in required");
             error.status = "ERROR"
+            error.statusCode = 400
             throw error;
         }
         const tour = await tourModel.findOne({ _id: id })
@@ -117,6 +119,7 @@ const getOneTour = async (params) => {
         if (!tour) {
             const error = new Error("Not found tour!");
             error.status = "ERROR"
+            error.statusCode = 404
             throw error;
         }
         return tour
@@ -132,6 +135,7 @@ const deleteOneTour = async (id) => {
         if (!id) {
             const error = new Error("The input in required");
             error.status = "ERROR"
+            error.statusCode = 400
             throw error;
         }
         return await tourModel.deleteOne({ _id: new mongoose.Types.ObjectId(id) })
@@ -159,6 +163,7 @@ const updateOneTour = async (params, body) => {
         if (!validId) {
             const error = new Error("Invalid ID format");
             error.status = "ERROR";
+            error.statusCode = 400
             throw error;
         }
         const tour = await tourModel.findOne({
