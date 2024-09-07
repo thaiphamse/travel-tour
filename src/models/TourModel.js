@@ -5,7 +5,10 @@ const TourSchema = new mongoose.Schema(
     tour_code: {
       type: String,
       unique: [true, "tour_code is an unique value"],
-      required: [true, 'tour_code is required']
+      required: [true, 'tour_code is required'],
+      set: function (value) {
+        return value.toUpperCase()
+      }
     },
     image: [{
       url: String,
