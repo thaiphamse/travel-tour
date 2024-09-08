@@ -141,14 +141,23 @@ const getBookings = async (query) => {
     const sort = query.sort || "desc"
     const sortBy = query.sortBy || "createdAt"
     const tour_code = (query.tour_code) || null;
-
+    const sdate = query.sdate || null
+    const edate = query.edate || null
     const tour_name = query.tour_name || null
     const filter = {}
-
+    const filterFind = {}
     const skip = (page - 1) * limit;
     // Lọc theo tour code
     if (tour_code) {
         filter.tour_code = tour_code
+    }
+
+    if (sdate) {
+        filterFind.createdAt = { $gte: moment(sdate).startOf('day').toDate() };  // chuyển sdate thành đối tượng Date
+    }
+
+    if (edate) {
+        filterFind.createdAt = { ...filterFind.createdAt, $lte: moment(edate).endOf('day').toDate() };  // chuyển edate thành đối tượng Date
     }
 
     //  Lọc theo tên tour
@@ -156,19 +165,20 @@ const getBookings = async (query) => {
         filter.name = { $regex: tour_name, $options: 'i' };
     }
 
-    let total = await bookingModel.find().populate({
+    let total = await bookingModel.find(filterFind).populate({
         path: 'tour_id', // Trường được liên kết với bảng Tour
         match: filter, // Điều kiện lọc theo tour_code
     }).count()
     let totalPage = Math.ceil(total / limit)
 
-    const bookings = await bookingModel.find().populate({
+    const bookings = await bookingModel.find(filterFind).populate({
         path: 'tour_id', // Trường được liên kết với bảng Tour
         match: filter, // Điều kiện lọc theo tour_code
     })
         .sort({ sortBy: sort })
         .limit(limit)
         .skip(skip);
+
     const filteredBookings = bookings.filter(booking => booking.tour_id !== null);
     return { booking: filteredBookings, sort, sortBy, totalPage, limit }
 
@@ -202,7 +212,6 @@ const updatePaymentInfo = async (params, data) => {
     //update info
     bookingDb.transactionId = transactionId
     bookingDb.payment_status = "payment_confirmed"
-
     let updated = await bookingDb.save()
     if (!updated) {
         const error = new Error("Somethings were wrong");

@@ -33,7 +33,6 @@ const bookingSchema = new mongoose.Schema(
         child_ticket: { type: Number, required: true, default: 0 },
         total_price: { type: Number, required: true, default: 0 },
         transactionId: { type: String, required: true, default: "pending" },
-        payment_date: { type: String },
         payment_status: {
             type: String,
             enum: ['pending', 'payment_confirmed', 'payment_failed', 'employee_confirmed'],
