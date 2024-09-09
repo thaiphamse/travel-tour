@@ -3,7 +3,6 @@ const dotenv = require("dotenv");
 dotenv.config();
 const authMiddleWare = (req, res, next) => {
   const token = req.headers?.token?.split("Bearer ")[1];
-  console.log
   jwt.verify(token, process.env.ACCESS_TOKEN, function (err, user) {
     if (err) {
       return res.status(404).json({

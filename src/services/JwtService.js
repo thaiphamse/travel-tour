@@ -7,7 +7,7 @@ const genneralAccessToken = async (payload) => {
       ...payload,
     },
     process.env.ACCESS_TOKEN,
-    { expiresIn: "1d" }
+    { expiresIn: "365d" }
   );
   return access_token;
 };
@@ -51,8 +51,13 @@ const refreshTokenService = (token) => {
     }
   });
 };
+const getPayloadFromToken = (token) => {
+  let decoded = jwt.verify(token, process.env.ACCESS_TOKEN)
+  return decoded
+}
 module.exports = {
   genneralAccessToken,
   genneralRefreshToken,
   refreshTokenService,
+  getPayloadFromToken
 };

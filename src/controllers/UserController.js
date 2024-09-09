@@ -158,14 +158,17 @@ const getAllUser = async (req, res) => {
 
 const getDetailUser = async (req, res) => {
   try {
+    const token = req.headers?.token?.split("Bearer ")[1];
     const userId = req.params.id;
-    if (!userId) {
-      return res.status(200).json({
+    if (!token) {
+      return res.status(403).json({
         status: "ERR",
-        message: "The userId is required",
+        message: "Forbidden. Please login",
       });
     }
-    const response = await UserService.getDetailUser(userId);
+    //get id from token
+    const { id } = JwtService.getPayloadFromToken(token)
+    const response = await UserService.getDetailUser(id);
     return res.status(200).json(response);
   } catch (e) {
     return res.status(404).json({
