@@ -13,7 +13,7 @@ const createBooking = async (data) => {
         fullname,
         adult_ticket,
         child_ticket,
-        payment_method_name
+        payment_method_name,
     } = data
 
     if (!tour_id ||
@@ -62,7 +62,7 @@ const getBookDetail = async (params) => {
         error.statusCode = 400
         throw error;
     }
-    const booking = await bookingModel.findById(validId).populate('hotel_level tour_id')
+    const booking = await bookingModel.findById(validId).populate('hotel_level tour_id tour_guide')
     const hotelInfo = await booking.getHotelInfo(); // Sử dụng phương thức tùy chỉn
     const bookingObject = booking.toObject({ virtuals: true });
     bookingObject.hotel_info = hotelInfo
@@ -171,10 +171,13 @@ const getBookings = async (query) => {
     }).count()
     let totalPage = Math.ceil(total / limit)
 
-    const bookings = await bookingModel.find(filterFind).populate({
-        path: 'tour_id', // Trường được liên kết với bảng Tour
-        match: filter, // Điều kiện lọc theo tour_code
-    })
+    const bookings = await bookingModel.find(filterFind)
+        .populate({
+            path: 'tour_id', // Trường được liên kết với bảng Tour
+            match: filter, // Điều kiện lọc theo tour_code
+        })
+        .populate("tour_guide")
+
         .sort({ sortBy: sort })
         .limit(limit)
         .skip(skip);
@@ -258,11 +261,53 @@ const getMyBooking = async (query, body) => {
     const filteredBookings = bookings.filter(booking => booking.tour_id !== null);
     return { booking: filteredBookings, sort, sortBy, totalPage, limit }
 }
+// Kiểm tra nhân viên rảnh trong khoảng thời gian tour
+const checkFreeScheduleUser = async (userId, startDate, endDate) => {
+    try {
+        // check valid id 
+        const validId = mongoose.Types.ObjectId.isValid(userId) ? new mongoose.Types.ObjectId(userId) : null;
+        if (!validId) {
+            const error = new Error("Invalid ID format");
+            error.status = "ERROR";
+            error.statusCode = 400
+            throw error;
+        }
+        console.log(validId)
+        let isExistBookingOfEmployee = await bookingModel.find()
+            .populate({
+                path: 'tour_guide',
+                match: {
+                    _id: validId
+                }
+            })
+            .populate({
+                path: 'tour_id',
+                match: {
+                    // $or: [
+                    //   {
+                    //     startDate: { $gte: new Date(endDate) }  // sdate and edate are before tour
+                    //   },
+                    //   {
+                    //     endDate: { $lte: new Date(startDate) }  // sdate and edate are after tour
+                    //   }
+                    // ]
+                }
+            })
+        return (isExistBookingOfEmployee)
+    } catch (error) {
+        const err = new Error()
+        err.status = "ERROR"
+        err.statusCode = 500
+        err.message = "Something were wrong!"
+        throw err
+    }
+}
 module.exports = {
     createBooking,
     getBookDetail,
     updateBooking,
     getBookings,
     updatePaymentInfo,
-    getMyBooking
+    getMyBooking,
+    checkFreeScheduleUser
 }

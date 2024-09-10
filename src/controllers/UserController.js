@@ -159,13 +159,7 @@ const getAllUser = async (req, res) => {
 const getDetailUser = async (req, res) => {
   try {
     const token = req.headers?.token?.split("Bearer ")[1];
-    const userId = req.params.id;
-    if (!token) {
-      return res.status(403).json({
-        status: "ERR",
-        message: "Forbidden. Please login",
-      });
-    }
+
     //get id from token
     const { id } = JwtService.getPayloadFromToken(token)
     const response = await UserService.getDetailUser(id);

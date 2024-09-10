@@ -34,12 +34,11 @@ const TourSchema = new mongoose.Schema(
       default: 0.00
     },
     start_date: {
-      type: String,
+      type: Date,
       required: true,
-
     },
     end_date: {
-      type: String,
+      type: Date,
       required: true,
 
     },
@@ -59,6 +58,7 @@ const TourSchema = new mongoose.Schema(
         }]
       }
     ],
+
   },
   {
     timestamps: true,

@@ -1,6 +1,8 @@
 const User = require("../models/UserModel");
 const bcrypt = require("bcrypt");
 const { genneralAccessToken, genneralRefreshToken } = require("./JwtService");
+const bookingModel = require('../models/BookingModel');
+const { default: mongoose } = require("mongoose");
 
 const createUser = (newUser) => {
   return new Promise(async (resolve, reject) => {
@@ -164,7 +166,7 @@ const deleteManyUser = (ids) => {
 const getAllUser = () => {
   return new Promise(async (resolve, reject) => {
     try {
-      const allUser = await User.find();
+      const allUser = await User.find().populate('tour');
       resolve({
         status: "OK",
         message: "success",
@@ -180,7 +182,9 @@ const getDetailUser = (id) => {
     try {
       const user = await User.findOne({
         _id: id,
-      });
+      })
+        .populate('tour')
+
       if (user === null) {
         resolve({
           status: "ERR",
@@ -214,11 +218,11 @@ const updatePassword = (newPass) => {
       const hashPassword = bcrypt.hashSync(password, 10);
       checkUser.password = hashPassword;
       const updateUser = await checkUser.save();
-      if (createUser) {
+      if (updateUser) {
         resolve({
           status: "OK",
-          message: "success",
-          data: updateUser,
+          message: "SUCCESS",
+          data: [test],
         });
       }
     } catch (e) {
@@ -236,4 +240,5 @@ module.exports = {
   getDetailUser,
   deleteManyUser,
   updatePassword,
+  // checkFreeScheduleUser
 };

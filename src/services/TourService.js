@@ -12,7 +12,7 @@ const createTour = async (tourData) => {
         base_price_child,
         start_date,
         end_date,
-        hodel_level,
+        hotel_level,
         schedules, image } = tourData
 
     if (!tour_code ||
@@ -49,7 +49,7 @@ const createTour = async (tourData) => {
         base_price_child,
         start_date,
         end_date,
-        hodel_level,
+        hotel_level,
         schedules,
         image
     })

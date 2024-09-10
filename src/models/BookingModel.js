@@ -41,7 +41,8 @@ const bookingSchema = new mongoose.Schema(
         payment_method_name: {
             type: String,
             enum: ['vnpay', 'paypal', 'cash']
-        }
+        },
+
     },
     {
         timestamps: true,
