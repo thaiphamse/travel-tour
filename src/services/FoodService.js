@@ -89,7 +89,7 @@ const getAllFood = ({ id, query }) => {
                 .limit(limit)
                 .skip(skip)
 
-            if (length.length == 0)
+            if (foods.length == 0)
                 reject({
                     status: "OK",
                     message: "NOT FOUND",

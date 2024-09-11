@@ -6,7 +6,7 @@ const {
   authUserMiddleWare,
 } = require("../MiddleWare/authMiddleWare");
 
-router.post("/sign-up", userController.createUser);
+router.post("/create-user", userController.createUser);
 router.post("/sign-in", userController.loginUser);
 router.post("/log-out", authUserMiddleWare, userController.logoutUser);
 router.put("/update-user/:id", authUserMiddleWare, userController.updateUser);
