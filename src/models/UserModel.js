@@ -24,10 +24,7 @@ const userSchema = new mongoose.Schema(
     address: { type: String },
     avatar: { type: String },
     city: { type: String },
-    tour: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Tour'
-    }
+    tours: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tour' }] //Danh sách tour phù hợp kinh nghiệm
   },
   {
     timestamps: true,

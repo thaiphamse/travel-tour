@@ -85,12 +85,8 @@ const updateBooking = async (params, data) => {
         throw error;
     }
 
-    const updateBooking = await bookingModel
-        .findOneAndUpdate(
-            { _id: id },
-            data,
-            { new: true }
-        )
+    const updateBooking = await bookingModel.findOneAndUpdate({ _id: id }, data, { new: true }
+    )
 
     if (!updateBooking) {
         const error = new Error('Not found booking');

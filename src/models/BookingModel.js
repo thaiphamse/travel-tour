@@ -42,7 +42,10 @@ const bookingSchema = new mongoose.Schema(
             type: String,
             enum: ['vnpay', 'paypal', 'cash']
         },
-
+        tour_guide: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        }
     },
     {
         timestamps: true,
