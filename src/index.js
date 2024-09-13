@@ -8,9 +8,10 @@ const routes = require("./routes");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const errorHandler = require("./MiddleWare/ErrorHandler");
+const morgan = require('morgan')
 
 app.use(cors());
-db.connect();
+app.use(morgan('dev'))
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: false }));
@@ -18,7 +19,10 @@ app.use(express.urlencoded({ limit: "10mb", extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
+db.connect();
+
 routes(app);
+
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });

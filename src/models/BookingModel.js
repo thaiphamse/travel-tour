@@ -45,12 +45,50 @@ const bookingSchema = new mongoose.Schema(
         tour_guide: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User'
+        },
+        group_number: {
+            type: Number,
+            default: 1
         }
     },
     {
         timestamps: true,
     }
 );
+// Pre-save hook để tính toán số lượng vé và phân nhóm
+bookingSchema.pre('save', async function (next) {
+    try {
+        if (this.isNew) {
+            // Tính tổng vé chuẩn bị thêm
+            const totalTickets = this.adult_ticket + this.child_ticket;
+
+            console.log("tổng vé chuẩn bị thêm ", totalTickets)
+            // Tìm nhóm hiện tại có số lượng booking
+            const bookingsInGroup = await mongoose.model('Booking').find({
+                tour_id: this.tour_id,
+                group_number: this.group_number
+            });
+
+            // Tính tổng số vé hiện tại trong nhóm
+            const currentGroupTotalTickets = bookingsInGroup.reduce((sum, booking) => {
+                return sum + booking.adult_ticket + booking.child_ticket;
+            }, 0);
+
+            console.log("tổng số vé hiện tại trong nhóm ", currentGroupTotalTickets)
+
+            // Nếu tổng số vé trong nhóm hiện tại cộng với vé mới vượt quá 20
+            if (currentGroupTotalTickets + totalTickets > 20) {
+                // Cập nhật group_number cho booking mới
+                this.group_number++
+                next()
+            }
+        }
+
+        next(); // Chuyển sang middleware tiếp theo
+    } catch (error) {
+        next(error); // Chuyển lỗi đến middleware xử lý lỗi
+    }
+});
 
 bookingSchema.methods.getHotelInfo = async function () {
     const tour = await tourModel.findById(this.tour_id);
