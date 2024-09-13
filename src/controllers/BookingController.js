@@ -92,11 +92,33 @@ const getMyBooking = async (req, res, next) => {
         next(e)
     }
 }
+const getBookingsByGroup = async (req, res, next) => {
+    try {
+        if (req.query.gn) {
+            const bookings = await bookingService.getBookingsByGroup({ groupNumber: req.query.gn })
+            return res.status(200).json({
+                status: "OK",
+                message: "SUCCESS",
+                data: bookings
+            })
+        }
+        const bookings = await bookingService.getBookingsByGroup({ groupNumber: req.query.gn })
+        return res.status(200).json({
+            status: "OK",
+            message: "SUCCESS",
+            data: bookings
+        })
+    } catch (e) {
+        console.error(e.message)
+        next(e)
+    }
+}
 module.exports = {
     createBooking,
     getBookDetail,
     updateBooking,
     getBookings,
     updatePaymentInfo,
+    getBookingsByGroup,
     getMyBooking
 }

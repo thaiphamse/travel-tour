@@ -167,6 +167,16 @@ const getBookings = async (query) => {
     }).count()
     let totalPage = Math.ceil(total / limit)
 
+
+    // Bước 1: Tìm tất cả các số nhóm khác nhau
+    const groups = await bookingModel.aggregate([
+        {
+            $group: {
+                _id: '$group_number'
+            }
+        }
+    ]);
+    console.log(groups)
     const bookings = await bookingModel.find(filterFind)
         .populate({
             path: 'tour_id', // Trường được liên kết với bảng Tour
@@ -180,6 +190,33 @@ const getBookings = async (query) => {
 
     const filteredBookings = bookings.filter(booking => booking.tour_id !== null);
     return { booking: filteredBookings, sort, sortBy, totalPage, limit }
+
+}
+const getBookingsByGroup = async ({ groupNumber }) => {
+    if (groupNumber) {
+        return await bookingModel.find({ group_number: groupNumber })
+            .populate('tour_id');
+    }
+    // Tìm tất cả các số nhóm khác nhau
+    const groups = await bookingModel.aggregate([
+        {
+            $group: {
+                _id: '$group_number'
+            }
+        }
+    ]);
+    //Truy vấn tất cả các booking trong từng nhóm
+    const groupNumbers = groups.map(group => group._id);
+    const bookingsGrouped = await bookingModel.find({ group_number: { $in: groupNumbers } })
+        .populate('tour_id');
+
+    // Bước 3: Tạo cấu trúc dữ liệu nhóm và booking
+    const result = groupNumbers.map(groupNumber => ({
+        group_number: groupNumber,
+        bookings: bookingsGrouped.filter(booking => booking.group_number === groupNumber)
+    }));
+
+    return result;
 
 }
 const updatePaymentInfo = async (params, data) => {
@@ -305,5 +342,6 @@ module.exports = {
     getBookings,
     updatePaymentInfo,
     getMyBooking,
-    checkFreeScheduleUser
+    checkFreeScheduleUser,
+    getBookingsByGroup
 }
