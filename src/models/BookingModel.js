@@ -89,7 +89,6 @@ bookingSchema.pre('save', async function (next) {
                 // Cập nhật group_number cho booking mới
                 console.log("Tang group number")
                 this.group_number = maxNumber + 1
-                next()
             } else {
                 this.group_number = maxNumber
             }

@@ -57,7 +57,6 @@ const TourSchema = new mongoose.Schema(
         }]
       }
     ],
-
   },
   {
     timestamps: true,

@@ -10,8 +10,7 @@ const createPlace = (newPlace) => {
             addressString,
             provinceId,
             districtId,
-            wardId,
-            location, image } = newPlace
+            image } = newPlace
         try {
             let newPlace = await placeModel.create({
                 name,
@@ -19,9 +18,7 @@ const createPlace = (newPlace) => {
                 description,
                 addressString,
                 provinceId,
-                districtId,
-                wardId,
-                location, image
+                image
             })
             if (!newPlace)
                 reject({
@@ -86,7 +83,6 @@ const getAllPlace = ({ id, query }) => {
         if (provinceId) {
             filter.provinceId = provinceId
         }
-
         // Lọc theo tên
         if (name)
             filter.name = { $regex: name, $options: 'i' }; //Optione i Không phân biệt chữ hoa chữ thường để khớp với chữ hoa và chữ thường

@@ -7,13 +7,13 @@ const createPlace = (req, res) => {
       name,
       description,
       addressString,
-      provinceId,
-      districtId } = req.body;
+      provinceId
+    } = req.body;
     if (!name ||
       !description ||
       !addressString ||
-      !provinceId ||
-      !districtId) {
+      !provinceId
+    ) {
       return res.status(200).json({
         status: "ERROR",
         message: "The input is required",
@@ -45,13 +45,7 @@ const createPlace = (req, res) => {
 const updatePlace = (req, res) => {
   try {
     const id = req.params.id || null
-    const {
-      name,
-      title,
-      description,
-      addressString,
-      provinceId,
-      districtId } = req.body;
+
     if (!id) {
       return res.status(200).json({
         status: "error",
