@@ -62,25 +62,36 @@ bookingSchema.pre('save', async function (next) {
             // Tính tổng vé chuẩn bị thêm
             const totalTickets = this.adult_ticket + this.child_ticket;
 
-            console.log("tổng vé chuẩn bị thêm ", totalTickets)
+            //Lấy ra group_number max trong db theo tour_id
+            const maxGroupNumber = await mongoose.model('Booking')
+                .find({ tour_id: this.tour_id, })
+                .sort({ group_number: 'descending' })
+                .limit(1)
+                .select('group_number')
+            console.log("maxGroupNumber ", maxGroupNumber)
+            let maxNumber = maxGroupNumber[0]?.group_number || 1
             // Tìm nhóm hiện tại có số lượng booking
             const bookingsInGroup = await mongoose.model('Booking').find({
                 tour_id: this.tour_id,
-                group_number: this.group_number
+                group_number: maxNumber
             });
-
+            console.log('bookingsInGroup ', bookingsInGroup)
             // Tính tổng số vé hiện tại trong nhóm
             const currentGroupTotalTickets = bookingsInGroup.reduce((sum, booking) => {
                 return sum + booking.adult_ticket + booking.child_ticket;
             }, 0);
 
             console.log("tổng số vé hiện tại trong nhóm ", currentGroupTotalTickets)
+            console.log("tổng vé chuẩn bị thêm ", totalTickets)
 
             // Nếu tổng số vé trong nhóm hiện tại cộng với vé mới vượt quá 20
-            if (currentGroupTotalTickets + totalTickets > 20) {
+            if ((currentGroupTotalTickets + totalTickets) > 20) {
                 // Cập nhật group_number cho booking mới
-                this.group_number++
+                console.log("Tang group number")
+                this.group_number = maxNumber + 1
                 next()
+            } else {
+                this.group_number = maxNumber
             }
         }
 

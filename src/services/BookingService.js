@@ -1,8 +1,10 @@
 const mongoose = require('mongoose');
 const bookingModel = require('../models/BookingModel');
 const tourModel = require('../models/TourModel')
+const userModel = require('../models/UserModel')
 const moment = require('moment');
 moment.locale('vi')
+
 const createBooking = async (data) => {
 
     const {
@@ -28,8 +30,17 @@ const createBooking = async (data) => {
         error.statusCode = 400; // Bad Request
         throw error;
     }
-    let total_price = await calculateTotalPrice({ tour_id, hotel_level, adult_ticket, child_ticket })
+    const validId = mongoose.Types.ObjectId.isValid(tour_id) ? new mongoose.Types.ObjectId(tour_id) : null;
+    if (!validId) {
+        const error = new Error("Invalid ID format");
+        error.status = "ERROR";
+        error.statusCode = 400
+        throw error;
+    }
+    let total_price = await calculateTotalPrice({ tour_id: validId, hotel_level, adult_ticket, child_ticket })
 
+
+    //Phân công nhân sự
     let booking = await bookingModel.create({
         tour_id,
         hotel_level,
@@ -85,19 +96,36 @@ const updateBooking = async (params, data) => {
         throw error;
     }
 
-    const updateBooking = await bookingModel.findOneAndUpdate({ _id: id }, data, { new: true }
-    )
+    if (data.tour_guide) {
+        const { role } = await userModel.findOne({ _id: data.tour_guide }).select('role')
+        console.log(role)
+        if (role !== 'employee') {
+            const error = new Error('Không thể phân công admin');
+            error.status = "ERROR"
+            error.statusCode = 400;
+            throw error;
+        }
+    }
+
+    const updateBooking = await bookingModel.findOneAndUpdate({ _id: id }, data, { new: true })
+        .populate('tour_guide tour_id')
 
     if (!updateBooking) {
         const error = new Error('Not found booking');
         error.status = "ERROR"
-        error.statusCode = 404; // Bad Request
+        error.statusCode = 404;
         throw error;
     }
     return updateBooking
 }
 //Tính tổng giá
-const calculateTotalPrice = async ({ tour_id, hotel_level, adult_ticket, child_ticket = 0 }) => {
+const calculateTotalPrice = async (
+    {
+        tour_id,
+        hotel_level,
+        adult_ticket,
+        child_ticket = 0
+    }) => {
     // Truy xuất tour
     const tour = await tourModel.findById(tour_id).exec();
     if (!tour) {
@@ -147,7 +175,7 @@ const getBookings = async (query) => {
     if (tour_code) {
         filter.tour_code = tour_code
     }
-
+    // Lọc theo ngày bắt đầu
     if (sdate) {
         filterFind.createdAt = { $gte: moment(sdate).startOf('day').toDate() };  // chuyển sdate thành đối tượng Date
     }
@@ -167,16 +195,6 @@ const getBookings = async (query) => {
     }).count()
     let totalPage = Math.ceil(total / limit)
 
-
-    // Bước 1: Tìm tất cả các số nhóm khác nhau
-    const groups = await bookingModel.aggregate([
-        {
-            $group: {
-                _id: '$group_number'
-            }
-        }
-    ]);
-    console.log(groups)
     const bookings = await bookingModel.find(filterFind)
         .populate({
             path: 'tour_id', // Trường được liên kết với bảng Tour

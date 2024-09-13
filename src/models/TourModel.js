@@ -1,4 +1,3 @@
-const moment = require("moment/moment");
 const mongoose = require("mongoose");
 const TourSchema = new mongoose.Schema(
   {
