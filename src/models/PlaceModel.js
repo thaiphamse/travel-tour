@@ -17,6 +17,10 @@ const placeSchema = new mongoose.Schema(
     },
     provinceId: {
       type: Number,
+    },
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'category'
     }
   },
   {

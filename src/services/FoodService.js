@@ -7,14 +7,23 @@ const createFood = (newFood) => {
             name,
             title,
             description,
-            image
+            image,
+            category
         } = newFood
         try {
+            const validId = mongoose.Types.ObjectId.isValid(category) ? new mongoose.Types.ObjectId(category) : null;
+            if (!validId) {
+                const error = new Error("Invalid ID category format");
+                error.status = "ERROR";
+                error.statusCode = 400
+                throw error;
+            }
             let newFoodCreated = await foodModel.create({
                 name,
                 title,
                 description,
-                image
+                image,
+                category: validId
             })
             if (!newFoodCreated)
                 reject({
@@ -31,6 +40,17 @@ const createFood = (newFood) => {
 const updateFood = (id, updateData) => {
     return new Promise(async (resolve, reject) => {
         try {
+            const { category } = updateData
+            if (category) {
+                const validId = mongoose.Types.ObjectId.isValid(category) ? new mongoose.Types.ObjectId(category) : null;
+                if (!validId) {
+                    reject({
+                        status: "ERROR",
+                        message: "Invalid category ID format",
+                    })
+                }
+            }
+
             let updateFood = await foodModel.findOneAndUpdate({ _id: id }, updateData, { new: true })
             if (!updateFood)
                 reject({

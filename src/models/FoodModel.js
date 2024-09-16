@@ -13,6 +13,10 @@ const foodSchema = new mongoose.Schema(
         enum: ["banner", "photos"]
       }
     }],
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'category'
+    }
   },
   {
     timestamps: true,
