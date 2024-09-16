@@ -184,7 +184,6 @@ const getDetailUser = (id) => {
       const user = await User.findOne({
         _id: id,
       })
-        .populate('tour')
 
       if (user === null) {
         resolve({

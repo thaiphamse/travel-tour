@@ -68,14 +68,13 @@ bookingSchema.pre('save', async function (next) {
                 .sort({ group_number: 'descending' })
                 .limit(1)
                 .select('group_number')
-            console.log("maxGroupNumber ", maxGroupNumber)
+
             let maxNumber = maxGroupNumber[0]?.group_number || 1
             // Tìm nhóm hiện tại có số lượng booking
             const bookingsInGroup = await mongoose.model('Booking').find({
                 tour_id: this.tour_id,
                 group_number: maxNumber
             });
-            console.log('bookingsInGroup ', bookingsInGroup)
             // Tính tổng số vé hiện tại trong nhóm
             const currentGroupTotalTickets = bookingsInGroup.reduce((sum, booking) => {
                 return sum + booking.adult_ticket + booking.child_ticket;
@@ -91,13 +90,15 @@ bookingSchema.pre('save', async function (next) {
                 this.group_number = maxNumber + 1
             } else {
                 this.group_number = maxNumber
+
                 //Phân công nhân sự của nhóm của vào
                 //Lấy tour_guide cũ 
-
-                const bookingOld = await mongoose.model('Booking').findOne({
-                    tour_id: this.tour_id,
-                    group_number: this.group_number
-                }).select('tour_guide')
+                const bookingOld = await mongoose.model('Booking')
+                    .findOne({
+                        tour_id: this.tour_id,
+                        group_number: this.group_number
+                    })
+                    .select('tour_guide')
                 this.tour_guide = bookingOld.tour_guide
             }
         }
