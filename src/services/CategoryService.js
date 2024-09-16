@@ -33,7 +33,7 @@ const getAll = async () => {
     //     path: 'tour', // Trường được liên kết với bảng Tour
     //     match: filter, // Điều kiện lọc theo tour_code
     // })
-    //     .sort({ sortBy: sort })
+    //         .sort([[`${sortBy}`, `${sort}`]])
     //     .limit(limit)
     //     .skip(skip);
 

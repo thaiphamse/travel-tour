@@ -1,6 +1,7 @@
 const { default: mongoose, trusted } = require('mongoose');
 const tourModel = require('../models/TourModel')
 const categoryModel = require('../models/CategoryModel')
+const bookingModel = require('../models/BookingModel')
 const createTour = async (tourData) => {
     const { tour_code,
         name,
@@ -99,7 +100,7 @@ const getAllTour = async (query) => {
         let total = await tourModel.count(filter)
         let totalPage = Math.ceil(total / limit)
         let tours = await tourModel.find(filter)
-            .sort({ sortBy: sort })
+            .sort([[`${sortBy}`, `${sort}`]])
             .limit(limit)
             .skip(skip)
             .populate('category')
@@ -160,6 +161,10 @@ const deleteOneTour = async (id) => {
             error.statusCode = 400
             throw error;
         }
+        //Xóa tất cả booking của tour này
+        await bookingModel.deleteMany({
+            tour_id: new mongoose.Types.ObjectId(id)
+        })
         return await tourModel.deleteOne({ _id: new mongoose.Types.ObjectId(id) })
     } catch (err) {
         const error = new Error(err.message)

@@ -127,7 +127,7 @@ const getAllPlace = ({ id, query }) => {
             let total = await placeModel.count(filter)
             let totalPage = Math.ceil(total / limit)
             let places = await placeModel.find(filter)
-                .sort({ sortBy: sort })
+                .sort([[`${sortBy}`, `${sort}`]])
                 .limit(limit)
                 .skip(skip)
                 .populate('category')

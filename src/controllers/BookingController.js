@@ -96,13 +96,29 @@ const getBookingsByGroup = async (req, res, next) => {
     try {
         if (req.query.gn) {
             const bookings = await bookingService.getBookingsByGroup({ groupNumber: req.query.gn })
+            const bookingsFilter = bookings.filter(booking => booking.tour_id !== null);
             return res.status(200).json({
                 status: "OK",
                 message: "SUCCESS",
-                data: bookings
+                data: bookingsFilter
             })
         }
         const bookings = await bookingService.getBookingsByGroup({ groupNumber: req.query.gn })
+        const bookingsFilter = bookings.filter(booking => booking.tour_id !== null);
+        return res.status(200).json({
+            status: "OK",
+            message: "SUCCESS",
+            data: bookingsFilter
+        })
+    } catch (e) {
+        console.error(e.message)
+        next(e)
+    }
+}
+const assignmentTourGuide = async (req, res, next) => {
+    try {
+
+        const bookings = await bookingService.assignmentGuideToBookings(req.body)
         return res.status(200).json({
             status: "OK",
             message: "SUCCESS",
@@ -120,5 +136,6 @@ module.exports = {
     getBookings,
     updatePaymentInfo,
     getBookingsByGroup,
-    getMyBooking
+    getMyBooking,
+    assignmentTourGuide
 }

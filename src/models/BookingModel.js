@@ -85,12 +85,20 @@ bookingSchema.pre('save', async function (next) {
             console.log("tổng vé chuẩn bị thêm ", totalTickets)
 
             // Nếu tổng số vé trong nhóm hiện tại cộng với vé mới vượt quá 20
-            if ((currentGroupTotalTickets + totalTickets) > 20) {
+            if ((currentGroupTotalTickets + totalTickets) > 10) {
                 // Cập nhật group_number cho booking mới
                 console.log("Tang group number")
                 this.group_number = maxNumber + 1
             } else {
                 this.group_number = maxNumber
+                //Phân công nhân sự của nhóm của vào
+                //Lấy tour_guide cũ 
+
+                const bookingOld = await mongoose.model('Booking').findOne({
+                    tour_id: this.tour_id,
+                    group_number: this.group_number
+                }).select('tour_guide')
+                this.tour_guide = bookingOld.tour_guide
             }
         }
 

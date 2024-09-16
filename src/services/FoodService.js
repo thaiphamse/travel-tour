@@ -114,7 +114,7 @@ const getAllFood = ({ id, query }) => {
             total = Math.ceil(total / limit)
 
             let foods = await foodModel.find(filter)
-                .sort({ sortBy: sort })
+                .sort([[`${sortBy}`, `${sort}`]])
                 .limit(limit)
                 .skip(skip)
                 .populate('category')

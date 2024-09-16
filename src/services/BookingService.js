@@ -39,7 +39,6 @@ const createBooking = async (data) => {
     }
     let total_price = await calculateTotalPrice({ tour_id: validId, hotel_level, adult_ticket, child_ticket })
 
-
     //Phân công nhân sự
     let booking = await bookingModel.create({
         tour_id,
@@ -171,6 +170,7 @@ const getBookings = async (query) => {
     const filter = {}
     const filterFind = {}
     const skip = (page - 1) * limit;
+
     // Lọc theo tour code
     if (tour_code) {
         filter.tour_code = tour_code
@@ -202,7 +202,7 @@ const getBookings = async (query) => {
         })
         .populate("tour_guide")
 
-        .sort({ sortBy: sort })
+        .sort([[`${sortBy}`, `${sort}`]])
         .limit(limit)
         .skip(skip);
 
@@ -213,7 +213,7 @@ const getBookings = async (query) => {
 const getBookingsByGroup = async ({ groupNumber }) => {
     if (groupNumber) {
         return await bookingModel.find({ group_number: groupNumber })
-            .populate('tour_id');
+            .populate('tour_id tour_guide');
     }
     // Tìm tất cả các số nhóm khác nhau
     const groups = await bookingModel.aggregate([
@@ -226,7 +226,7 @@ const getBookingsByGroup = async ({ groupNumber }) => {
     //Truy vấn tất cả các booking trong từng nhóm
     const groupNumbers = groups.map(group => group._id);
     const bookingsGrouped = await bookingModel.find({ group_number: { $in: groupNumbers } })
-        .populate('tour_id');
+        .populate('tour_id tour_guide');
 
     // Bước 3: Tạo cấu trúc dữ liệu nhóm và booking
     const result = groupNumbers.map(groupNumber => ({
@@ -306,7 +306,7 @@ const getMyBooking = async (query, body) => {
         path: 'tour_id', // Trường được liên kết với bảng Tour
         match: filter, // Điều kiện lọc theo tour_code
     })
-        .sort({ sortBy: sort })
+        .sort([[`${sortBy}`, `${sort}`]])
         .limit(limit)
         .skip(skip);
     const filteredBookings = bookings.filter(booking => booking.tour_id !== null);
@@ -323,7 +323,6 @@ const checkFreeScheduleUser = async (userId, startDate, endDate) => {
             error.statusCode = 400
             throw error;
         }
-        console.log(validId)
         let isExistBookingOfEmployee = await bookingModel.find()
             .populate({
                 path: 'tour_guide',
@@ -353,6 +352,49 @@ const checkFreeScheduleUser = async (userId, startDate, endDate) => {
         throw err
     }
 }
+const assignmentGuideToBookings = async (data) => {
+    const group_number = data.group_number
+    const tour_guide_id = data.tour_guide_id
+    const tour_id = data.tour_id
+
+    if (!group_number ||
+        !tour_guide_id ||
+        !tour_id) {
+        const error = new Error("The input is required");
+        error.status = "ERROR";
+        error.statusCode = 400
+        throw error;
+    }
+
+    try {
+        const tourGuide = await userModel.findOne({ _id: tour_guide_id })
+        if (!tourGuide) {
+            const error = new Error("Tour guide is not found!");
+            error.status = "ERROR";
+            error.statusCode = 404
+            throw error;
+        }
+        // Lấy ra các thông tin khách hàng trong 1 đoàn để update tour_guide
+        // const bookings = await bookingModel.find({
+        //     group_number: group_number,
+        //     tour_id: tour_id
+        // })
+        return await bookingModel.updateMany(
+            {
+                group_number: group_number,
+                tour_id: tour_id
+            },
+            { tour_guide: tourGuide },
+            { new: true }
+        )
+        // return await
+    } catch (err) {
+        const error = new Error(err.message);
+        error.status = "ERROR";
+        error.statusCode = 500
+        throw error;
+    }
+}
 module.exports = {
     createBooking,
     getBookDetail,
@@ -361,5 +403,6 @@ module.exports = {
     updatePaymentInfo,
     getMyBooking,
     checkFreeScheduleUser,
-    getBookingsByGroup
+    getBookingsByGroup,
+    assignmentGuideToBookings
 }

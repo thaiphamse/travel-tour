@@ -8,6 +8,7 @@ const {
 
 
 router.post('/', authMiddleWare, bookingController.createBooking)
+router.post('/group/assignment', bookingController.assignmentTourGuide)
 
 router.put('/:id/paid', bookingController.updatePaymentInfo)
 
