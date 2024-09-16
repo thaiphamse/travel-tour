@@ -10,15 +10,25 @@ const createPlace = (newPlace) => {
             addressString,
             provinceId,
             districtId,
-            image } = newPlace
+            image,
+            category } = newPlace
         try {
+            const validId = mongoose.Types.ObjectId.isValid(category) ? new mongoose.Types.ObjectId(category) : null;
+            if (!validId) {
+                const error = new Error("Invalid category ID format");
+                error.status = "ERROR";
+                error.statusCode = 400
+                throw error;
+            }
+
             let newPlace = await placeModel.create({
                 name,
                 title,
                 description,
                 addressString,
                 provinceId,
-                image
+                image,
+                category
             })
             if (!newPlace)
                 reject({
@@ -35,6 +45,17 @@ const createPlace = (newPlace) => {
 const updatePlace = (id, newPlaceData) => {
     return new Promise(async (resolve, reject) => {
         try {
+            const { category } = newPlaceData
+            if (category) {
+                const validId = mongoose.Types.ObjectId.isValid(category) ? new mongoose.Types.ObjectId(category) : null;
+                if (!validId) {
+                    reject({
+                        status: "ERROR",
+                        message: "Invalid category ID format",
+                    })
+                }
+            }
+
             let updatePlace = await placeModel.findOneAndUpdate({ _id: id }, newPlaceData, { new: true })
             if (!updatePlace)
                 reject({
