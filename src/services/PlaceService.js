@@ -1,5 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const placeModel = require("../models/PlaceModel");
+const categoryModel = require('../models/CategoryModel')
 // CRUD
 const createPlace = (newPlace) => {
     return new Promise(async (resolve, reject) => {
@@ -20,7 +21,13 @@ const createPlace = (newPlace) => {
                 error.statusCode = 400
                 throw error;
             }
-
+            let categoryDb = await categoryModel.findOne({ _id: category })
+            if (!categoryDb) {
+                reject({
+                    status: "ERROR",
+                    message: "Category is not found",
+                })
+            }
             let newPlace = await placeModel.create({
                 name,
                 title,
@@ -30,6 +37,7 @@ const createPlace = (newPlace) => {
                 image,
                 category
             })
+            newPlace = { ...newPlace._doc, categoryDb }
             if (!newPlace)
                 reject({
                     status: "OK",
@@ -55,8 +63,15 @@ const updatePlace = (id, newPlaceData) => {
                     })
                 }
             }
-
+            let categoryDb = await categoryModel.findOne({ _id: category })
+            if (!categoryDb) {
+                reject({
+                    status: "ERROR",
+                    message: "Category is not found",
+                })
+            }
             let updatePlace = await placeModel.findOneAndUpdate({ _id: id }, newPlaceData, { new: true })
+            updatePlace = { ...updatePlace._doc, categoryDb }
             if (!updatePlace)
                 reject({
                     status: "ERROR",
@@ -115,6 +130,7 @@ const getAllPlace = ({ id, query }) => {
                 .sort({ sortBy: sort })
                 .limit(limit)
                 .skip(skip)
+                .populate('category')
 
             if (places.length == 0)
                 reject({
@@ -141,7 +157,7 @@ const getOnePlace = (id) => {
         const filter = { _id: id }
         console.log(filter)
         try {
-            let place = await placeModel.findOne(filter)
+            let place = await placeModel.findOne(filter).populate('category')
             if (!place) {
                 reject({
                     status: "OK",

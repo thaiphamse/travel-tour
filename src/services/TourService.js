@@ -1,5 +1,6 @@
 const { default: mongoose, trusted } = require('mongoose');
 const tourModel = require('../models/TourModel')
+const categoryModel = require('../models/CategoryModel')
 const createTour = async (tourData) => {
     const { tour_code,
         name,
@@ -13,7 +14,9 @@ const createTour = async (tourData) => {
         start_date,
         end_date,
         hotel_level,
-        schedules, image } = tourData
+        schedules,
+        image,
+        category } = tourData
 
     if (!tour_code ||
         !name ||
@@ -30,6 +33,22 @@ const createTour = async (tourData) => {
         error.statusCode = 400; // Bad Request
         throw error;
     }
+    if (category) {
+        const validId = mongoose.Types.ObjectId.isValid(category) ? new mongoose.Types.ObjectId(category) : null;
+        if (!validId) {
+            const error = new Error("Invalid category ID format");
+            error.status = "ERROR";
+            error.statusCode = 400
+            throw error;
+        }
+    }
+    let categoryDb = await categoryModel.findOne({ _id: category })
+    if (!categoryDb) {
+        const error = new Error("Category is not found");
+        error.status = "ERROR";
+        error.statusCode = 404
+        throw error;
+    }
     const tour = await tourModel.findOne({ tour_code: tour_code })
     if (tour) {
         const error = new Error('Trùng giá trị tour code!');
@@ -37,7 +56,7 @@ const createTour = async (tourData) => {
         error.statusCode = 400; // Bad Request
         throw error;
     }
-    return await tourModel.create({
+    let tourSaved = await tourModel.create({
         tour_code,
         name,
         description,
@@ -51,8 +70,10 @@ const createTour = async (tourData) => {
         end_date,
         hotel_level,
         schedules,
-        image
+        image,
+        category
     })
+    return await tourSaved.populate('category')
 }
 const getAllTour = async (query) => {
     const page = query.page || 1
@@ -81,6 +102,7 @@ const getAllTour = async (query) => {
             .sort({ sortBy: sort })
             .limit(limit)
             .skip(skip)
+            .populate('category')
 
         if (tours.length === 0) {
             const error = new Error("Not found tour");
@@ -114,7 +136,7 @@ const getOneTour = async (params) => {
             error.statusCode = 400
             throw error;
         }
-        const tour = await tourModel.findOne({ _id: id })
+        const tour = await tourModel.findOne({ _id: id }).populate('category')
 
         if (!tour) {
             const error = new Error("Not found tour!");
@@ -148,16 +170,7 @@ const deleteOneTour = async (id) => {
 const updateOneTour = async (params, body) => {
     try {
         const id = params.id || null
-        const { tour_code,
-            name,
-            description,
-            shedule_on_week,
-            transportation,
-            start_location,
-            end_location,
-            start_date,
-            end_date,
-            schedules } = body
+        const { tour_code } = body
 
         const validId = mongoose.Types.ObjectId.isValid(id) ? new mongoose.Types.ObjectId(id) : null;
         if (!validId) {
@@ -177,7 +190,8 @@ const updateOneTour = async (params, body) => {
             throw error;
         }
 
-        return await tourModel.findByIdAndUpdate(validId, body, { new: true })
+        let updated = await tourModel.findByIdAndUpdate(validId, body, { new: true })
+        return await updated.populate('category')
 
     } catch (err) {
         const error = new Error(err.message)

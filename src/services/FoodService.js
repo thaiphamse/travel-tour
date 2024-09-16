@@ -1,5 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const foodModel = require("../models/FoodModel");
+const categoryModel = require('../models/CategoryModel')
 // CRUD
 const createFood = (newFood) => {
     return new Promise(async (resolve, reject) => {
@@ -18,6 +19,13 @@ const createFood = (newFood) => {
                 error.statusCode = 400
                 throw error;
             }
+            let categoryDb = await categoryModel.findOne({ _id: category })
+            if (!categoryDb) {
+                reject({
+                    status: "ERROR",
+                    message: "Category is not found",
+                })
+            }
             let newFoodCreated = await foodModel.create({
                 name,
                 title,
@@ -30,6 +38,7 @@ const createFood = (newFood) => {
                     status: "ERROR",
                     message: "error",
                 })
+            newFoodCreated = { ...newFoodCreated._doc, categoryDb }
             resolve(newFoodCreated)
         } catch (error) {
             reject(error)
@@ -51,7 +60,7 @@ const updateFood = (id, updateData) => {
                 }
             }
 
-            let updateFood = await foodModel.findOneAndUpdate({ _id: id }, updateData, { new: true })
+            let updateFood = await foodModel.findOneAndUpdate({ _id: id }, updateData, { new: true }).populate('category')
             if (!updateFood)
                 reject({
                     status: "ERROR",
@@ -108,6 +117,7 @@ const getAllFood = ({ id, query }) => {
                 .sort({ sortBy: sort })
                 .limit(limit)
                 .skip(skip)
+                .populate('category')
 
             if (foods.length == 0)
                 reject({
@@ -134,7 +144,7 @@ const getOneFood = (id) => {
         const filter = { _id: id }
 
         try {
-            let place = await foodModel.findOne(filter)
+            let place = await foodModel.findOne(filter).populate('category')
             if (!place) {
                 reject({
                     status: "OK",
