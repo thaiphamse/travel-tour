@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const tourController = require('../controllers/TourController')
 const {
-    authUserMiddleWare,
+    // authUserMiddleWare,
     authMiddleWare,
 } = require("../MiddleWare/authMiddleWare");
 

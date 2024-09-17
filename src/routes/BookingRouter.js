@@ -3,7 +3,7 @@ const router = express.Router();
 const bookingController = require('../controllers/BookingController')
 const {
     authMiddleWare,
-    authUserMiddleWare
+    // authUserMiddleWare
 } = require("../MiddleWare/authMiddleWare");
 
 

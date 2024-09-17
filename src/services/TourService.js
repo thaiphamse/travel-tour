@@ -1,6 +1,6 @@
 const { default: mongoose, trusted } = require('mongoose');
 const tourModel = require('../models/TourModel')
-const categoryModel = require('../models/CategoryModel')
+const categoryTour = require('../models/CategoryTourModel')
 const bookingModel = require('../models/BookingModel')
 const createTour = async (tourData) => {
     const { tour_code,
@@ -43,7 +43,7 @@ const createTour = async (tourData) => {
             throw error;
         }
     }
-    let categoryDb = await categoryModel.findOne({ _id: category })
+    let categoryDb = await categoryTour.findOne({ _id: category })
     if (!categoryDb) {
         const error = new Error("Category is not found");
         error.status = "ERROR";
@@ -128,6 +128,7 @@ const getAllTour = async (query) => {
         throw error;
     }
 }
+
 const getOneTour = async (params) => {
     try {
         const id = params.id || null

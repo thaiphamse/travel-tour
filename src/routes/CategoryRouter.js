@@ -4,7 +4,7 @@ const categoryController = require("../controllers/CategoryController");
 
 const {
     authMiddleWare,
-    authUserMiddleWare,
+    // authUserMiddleWare,
 } = require("../MiddleWare/authMiddleWare");
 
 router.post('/', authMiddleWare, categoryController.createCategory)
