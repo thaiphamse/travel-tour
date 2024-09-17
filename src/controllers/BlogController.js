@@ -63,13 +63,13 @@ const updateBlog = (req, res) => {
         return res.status(500).json({
 
           status: "ERROR",
-          message: err,
+          message: err.message,
         });
       })
   } catch (e) {
     return res.status(500).json({
       status: "ERROR",
-      message: e,
+      message: e.message,
     });
   }
 };
@@ -94,7 +94,8 @@ const deleteBlog = (req, res) => {
       })
       .catch(err => {
         return res.status(404).json({
-          message: err,
+          status: "ERROR",
+          message: err.message,
         });
       })
   } catch (e) {
@@ -116,7 +117,7 @@ const getAllBlog = (req, res) => {
       .catch(err => {
         return res.status(404).json({
           status: "ERROR",
-          message: err,
+          message: err.message,
         });
       })
   } catch (e) {
@@ -144,7 +145,7 @@ const getOneBlog = (req, res) => {
   } catch (err) {
     return res.status(200).json({
       status: "ERROR",
-      message: err.message,
+      message: err,
     });
   }
 }

@@ -22,7 +22,6 @@ const createBlog = (newBlogData) => {
                 throw error;
             }
             let categoryDb = await categoryModel.findOne({ _id: category })
-            console.log(category)
             if (!categoryDb) {
                 reject({
                     status: "ERROR",
@@ -75,7 +74,7 @@ const updateBlog = (id, newBlogData) => {
             if (!updateBlog)
                 reject({
                     status: "ERROR",
-                    message: "error",
+                    message: "Blog is not found",
                 })
             resolve(updateBlog.populate('category'))
         } catch (error) {
@@ -165,7 +164,6 @@ const getOneBlog = (id) => {
                 reject({
                     status: "OK",
                     message: "NO DATA FOUND",
-                    data: place
                 })
             }
             resolve({
