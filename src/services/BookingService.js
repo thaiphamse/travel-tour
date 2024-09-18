@@ -210,9 +210,9 @@ const getBookings = async (query) => {
     return { booking: filteredBookings, sort, sortBy, totalPage, limit }
 
 }
-const getBookingsByGroup = async ({ groupNumber }) => {
+const getBookingsByGroup = async ({ groupNumber, tour }) => {
     if (groupNumber) {
-        return await bookingModel.find({ group_number: groupNumber })
+        return await bookingModel.find({ tour_id: tour, group_number: groupNumber })
             .populate('tour_id tour_guide');
     }
     // Tìm tất cả các số nhóm khác nhau
@@ -225,7 +225,7 @@ const getBookingsByGroup = async ({ groupNumber }) => {
     ]);
     //Truy vấn tất cả các booking trong từng nhóm
     const groupNumbers = groups.map(group => group._id);
-    const bookingsGrouped = await bookingModel.find({ group_number: { $in: groupNumbers } })
+    const bookingsGrouped = await bookingModel.find({ tour_id: tour, group_number: { $in: groupNumbers } })
         .populate('tour_id tour_guide');
 
     // Bước 3: Tạo cấu trúc dữ liệu nhóm và booking

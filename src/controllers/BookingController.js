@@ -95,7 +95,7 @@ const getMyBooking = async (req, res, next) => {
 const getBookingsByGroup = async (req, res, next) => {
     try {
         if (req.query.gn) {
-            const bookings = await bookingService.getBookingsByGroup({ groupNumber: req.query.gn })
+            const bookings = await bookingService.getBookingsByGroup({ groupNumber: req.query.gn, tour: req.query.tour })
             const bookingsFilter = bookings.filter(booking => booking.tour_id !== null);
             return res.status(200).json({
                 status: "OK",
@@ -103,7 +103,7 @@ const getBookingsByGroup = async (req, res, next) => {
                 data: bookingsFilter
             })
         }
-        const bookings = await bookingService.getBookingsByGroup({ groupNumber: req.query.gn })
+        const bookings = await bookingService.getBookingsByGroup({ groupNumber: req.query.gn, tour: req.query.tour })
         const bookingsFilter = bookings.filter(booking => booking.tour_id !== null);
         return res.status(200).json({
             status: "OK",
