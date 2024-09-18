@@ -99,7 +99,7 @@ bookingSchema.pre('save', async function (next) {
                         group_number: this.group_number
                     })
                     .select('tour_guide')
-                this.tour_guide = bookingOld.tour_guide
+                this.tour_guide = bookingOld?.tour_guide
             }
         }
 

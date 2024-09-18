@@ -313,45 +313,27 @@ const getMyBooking = async (query, body) => {
     return { booking: filteredBookings, sort, sortBy, totalPage, limit }
 }
 // Kiểm tra nhân viên rảnh trong khoảng thời gian tour
-const checkFreeScheduleUser = async (userId, startDate, endDate) => {
-    try {
-        // check valid id 
-        const validId = mongoose.Types.ObjectId.isValid(userId) ? new mongoose.Types.ObjectId(userId) : null;
-        if (!validId) {
-            const error = new Error("Invalid ID format");
-            error.status = "ERROR";
-            error.statusCode = 400
-            throw error;
-        }
-        let isExistBookingOfEmployee = await bookingModel.find()
-            .populate({
-                path: 'tour_guide',
-                match: {
-                    _id: validId
-                }
-            })
-            .populate({
-                path: 'tour_id',
-                match: {
-                    // $or: [
-                    //   {
-                    //     startDate: { $gte: new Date(endDate) }  // sdate and edate are before tour
-                    //   },
-                    //   {
-                    //     endDate: { $lte: new Date(startDate) }  // sdate and edate are after tour
-                    //   }
-                    // ]
-                }
-            })
-        return (isExistBookingOfEmployee)
-    } catch (error) {
-        const err = new Error()
-        err.status = "ERROR"
-        err.statusCode = 500
-        err.message = "Something were wrong!"
-        throw err
-    }
-}
+// const checkFreeScheduleUser = async (userId, startDate, endDate) => {
+//     try {
+//         // check valid id 
+//         const validId = mongoose.Types.ObjectId.isValid(userId) ? new mongoose.Types.ObjectId(userId) : null;
+//         if (!validId) {
+//             const error = new Error("Invalid ID format");
+//             error.status = "ERROR";
+//             error.statusCode = 400
+//             throw error;
+//         }
+//         let isExistBookingOfEmployee = await userModel.find()
+
+//         return (isExistBookingOfEmployee)
+//     } catch (error) {
+//         const err = new Error()
+//         err.status = "ERROR"
+//         err.statusCode = 500
+//         err.message = "Something were wrong!"
+//         throw err
+//     }
+// }
 const assignmentGuideToBookings = async (data) => {
     const group_number = data.group_number
     const tour_guide_id = data.tour_guide_id
@@ -375,10 +357,6 @@ const assignmentGuideToBookings = async (data) => {
             throw error;
         }
         // Lấy ra các thông tin khách hàng trong 1 đoàn để update tour_guide
-        // const bookings = await bookingModel.find({
-        //     group_number: group_number,
-        //     tour_id: tour_id
-        // })
         return await bookingModel.updateMany(
             {
                 group_number: group_number,
@@ -402,7 +380,7 @@ module.exports = {
     getBookings,
     updatePaymentInfo,
     getMyBooking,
-    checkFreeScheduleUser,
+    // checkFreeScheduleUser,
     getBookingsByGroup,
     assignmentGuideToBookings
 }

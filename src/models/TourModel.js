@@ -43,7 +43,7 @@ const TourSchema = new mongoose.Schema(
     },
     hotel_level: [
       {
-        star: { type: Number, required: true, unique: true },
+        star: { type: Number, required: true },
         price_adult: { type: String, required: true, default: 0 },
         price_child: { type: String, required: true, default: 0 },
       },

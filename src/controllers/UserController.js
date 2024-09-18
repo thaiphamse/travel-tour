@@ -209,6 +209,19 @@ const updatePassword = async (req, res) => {
   }
 };
 
+const checkFreeScheduleUser = async (req, res, next) => {
+  try {
+    const response = await UserService.checkFreeScheduleUser(req.body);
+    return res.status(200).json({
+      status: "OK",
+      message: "SUCCESS",
+      data: response
+    });
+  } catch (error) {
+    console.error(error)
+    next(error)
+  }
+}
 module.exports = {
   createUser,
   loginUser,
@@ -220,5 +233,5 @@ module.exports = {
   logoutUser,
   deleteMany,
   updatePassword,
-
+  checkFreeScheduleUser
 };
