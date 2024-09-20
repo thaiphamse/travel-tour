@@ -51,10 +51,7 @@ const TourSchema = new mongoose.Schema(
     schedules: [
       {
         day: Number,
-        detail: { type: Object, required: true },
-        foods: [{
-          type: mongoose.Schema.Types.ObjectId, ref: 'Food'
-        }]
+        detail: [{ type: Object, required: true }],
       }
     ],
     category: {

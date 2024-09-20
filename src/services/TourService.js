@@ -120,8 +120,6 @@ const getAllTour = async (query) => {
             tours,
             limit
         }
-
-
     } catch (err) {
         const error = new Error(err.message);
         error.status = "ERROR"
