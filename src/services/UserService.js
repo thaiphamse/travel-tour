@@ -169,7 +169,7 @@ const deleteManyUser = (ids) => {
 const getAllUser = () => {
   return new Promise(async (resolve, reject) => {
     try {
-      const allUser = await User.find({ role: { "$nin": ['admin'] } });
+      const allUser = await User.find();
       resolve({
         status: "OK",
         message: "success",

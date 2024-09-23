@@ -118,7 +118,6 @@ const getAllBlog = (req, res) => {
         return res.status(404).json({
           status: "ERROR",
           message: err.message,
-          data: []
         });
       })
   } catch (e) {

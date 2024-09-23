@@ -123,7 +123,6 @@ const getAllFood = ({ id, query }) => {
                 reject({
                     status: "OK",
                     message: "NOT FOUND",
-                    data: []
                 })
             resolve({
                 status: "OK",
