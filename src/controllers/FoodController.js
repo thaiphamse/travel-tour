@@ -112,6 +112,7 @@ const getAllFood = (req, res) => {
       .catch(err => {
         return res.status(404).json({
           message: err,
+          data: []
         });
       })
   } catch (e) {
