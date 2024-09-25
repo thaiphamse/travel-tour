@@ -7,6 +7,7 @@ const bookingRouter = require('./BookingRouter.js')
 const commentRouter = require('./CommentRouter.js')
 const categoryRouter = require('./CategoryRouter.js')
 const categoryTourRouter = require('./CategoryTourRouter.js')
+
 const routes = (app) => {
   app.use("/api/user", userRouter)
   app.use("/api/place", placeRouter)

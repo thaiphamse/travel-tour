@@ -4,8 +4,11 @@ const categoryTourModel = require('../models/CategoryTourModel')
 const create = async (data) => {
     const name = data.name || null
     const thumbnail = data.thumbnail || null
+    const description = data.description || null
+
     if (!name ||
-        !thumbnail) {
+        !thumbnail ||
+        !description) {
         const error = new Error('The input in required!');
         error.status = "ERROR";
         error.statusCode = 400
@@ -13,7 +16,8 @@ const create = async (data) => {
     }
     return await categoryTourModel.create({
         name,
-        thumbnail
+        thumbnail,
+        description
     })
 }
 

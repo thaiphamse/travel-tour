@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const blogController = require('../controllers/BlogController')
 const {
-  // authUserMiddleWare,
   authMiddleWare,
 } = require("../MiddleWare/authMiddleWare");
 
