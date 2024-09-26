@@ -198,10 +198,28 @@ const updateOneTour = async (params, body) => {
         throw error
     }
 }
+const getFiveMainTour = async () => {
+    try {
+
+        // Bước 3: Truy vấn thông tin chi tiết của các tour
+        const tours = await tourModel
+            .find()
+            .limit(5)
+            .sort("createdAt desc")
+
+        return tours;
+
+    } catch (err) {
+        const error = new Error(err.message)
+        err.status = "ERROR"
+        throw error
+    }
+}
 module.exports = {
     createTour,
     getAllTour,
     getOneTour,
     deleteOneTour,
-    updateOneTour
+    updateOneTour,
+    getFiveMainTour
 }

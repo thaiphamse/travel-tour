@@ -69,10 +69,24 @@ const updateOneTour = async (req, res, next) => {
         next(error)
     }
 }
+const getFiveMainTour = async (req, res, next) => {
+    try {
+
+        let mainTours = await tourService.getFiveMainTour()
+        return res.status(200).json({
+            status: "OK",
+            message: "SUCCESS",
+            data: mainTours
+        })
+    } catch (error) {
+        next(error)
+    }
+}
 module.exports = {
     createTour,
     getAllTour,
     getOneTour,
     deleteOneTour,
-    updateOneTour
+    updateOneTour,
+    getFiveMainTour
 }
