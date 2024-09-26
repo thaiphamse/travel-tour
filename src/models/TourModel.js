@@ -21,6 +21,7 @@ const TourSchema = new mongoose.Schema(
     shedule_on_week: { type: String },
     start_location: { type: String, required: true },
     end_location: { type: String, required: true },
+    is_active: { type: Boolean, default: true },
     transportation: { type: String, enum: ['plane', 'car'], default: 'car', required: true },
     base_price_adult: {
       type: Number,
@@ -31,15 +32,6 @@ const TourSchema = new mongoose.Schema(
       type: Number,
       required: [true, "base_price_child is a required value"],
       default: 0.00
-    },
-    start_date: {
-      type: Date,
-      required: true,
-    },
-    end_date: {
-      type: Date,
-      required: true,
-
     },
     hotel_level: [
       {

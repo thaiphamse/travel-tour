@@ -12,8 +12,6 @@ const createTour = async (tourData) => {
         end_location,
         base_price_adult,
         base_price_child,
-        start_date,
-        end_date,
         hotel_level,
         schedules,
         image,
@@ -26,8 +24,7 @@ const createTour = async (tourData) => {
         !transportation ||
         !start_location ||
         !end_location ||
-        !start_date ||
-        !end_date || schedules.length === 0) {
+        schedules.length === 0) {
 
         const error = new Error('The input in required!');
         error.status = "ERROR"
@@ -67,8 +64,6 @@ const createTour = async (tourData) => {
         end_location,
         base_price_adult,
         base_price_child,
-        start_date,
-        end_date,
         hotel_level,
         schedules,
         image,

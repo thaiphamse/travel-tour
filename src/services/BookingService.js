@@ -16,6 +16,8 @@ const createBooking = async (data) => {
         adult_ticket,
         child_ticket,
         payment_method_name,
+        start_date,
+        end_date
     } = data
 
     if (!tour_id ||
@@ -49,13 +51,14 @@ const createBooking = async (data) => {
         adult_ticket,
         child_ticket,
         payment_method_name,
-        total_price
+        total_price,
+        start_date,
+        end_date
     })
     const hotelInfo = await booking.getHotelInfo(); // Sử dụng phương thức tùy chỉn
     const bookingObject = booking.toObject({ virtuals: true });
     bookingObject.hotel_info = hotelInfo
     return bookingObject
-
 }
 const getBookDetail = async (params) => {
     const id = params.id || null
@@ -128,6 +131,7 @@ const calculateTotalPrice = async (
     // Truy xuất tour
     const tour = await tourModel.findById(tour_id).exec();
     if (!tour) {
+        let error = new Error()
         error.message = "Tour not found"
         error.status = "ERROR";
         error.statusCode = 404

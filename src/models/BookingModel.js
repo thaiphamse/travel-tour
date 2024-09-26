@@ -49,7 +49,13 @@ const bookingSchema = new mongoose.Schema(
         group_number: {
             type: Number,
             default: 1
-        }
+        },
+        start_date: {
+            type: Date,
+        },
+        end_date: {
+            type: Date
+        },
     },
     {
         timestamps: true,
@@ -62,9 +68,19 @@ bookingSchema.pre('save', async function (next) {
             // Tính tổng vé chuẩn bị thêm
             const totalTickets = this.adult_ticket + this.child_ticket;
 
-            //Lấy ra group_number max trong db theo tour_id
+            let filter = {}
+            filter.tour_id = this.tour_id
+
+            if (this.start_date && this.end_date) {
+                filter.start_date = this.start_date
+                filter.end_date = this.end_date
+            } else {
+                this.group_number = null
+                return next()
+            }
+            //Lấy ra group_number max trong db theo tour_id và ngày xuất phát
             const maxGroupNumber = await mongoose.model('Booking')
-                .find({ tour_id: this.tour_id, })
+                .find(filter)
                 .sort({ group_number: 'descending' })
                 .limit(1)
                 .select('group_number')
@@ -72,7 +88,7 @@ bookingSchema.pre('save', async function (next) {
             let maxNumber = maxGroupNumber[0]?.group_number || 1
             // Tìm nhóm hiện tại có số lượng booking
             const bookingsInGroup = await mongoose.model('Booking').find({
-                tour_id: this.tour_id,
+                ...filter,
                 group_number: maxNumber
             });
             // Tính tổng số vé hiện tại trong nhóm
@@ -86,7 +102,6 @@ bookingSchema.pre('save', async function (next) {
             // Nếu tổng số vé trong nhóm hiện tại cộng với vé mới vượt quá 20
             if ((currentGroupTotalTickets + totalTickets) > 10) {
                 // Cập nhật group_number cho booking mới
-                console.log("Tang group number")
                 this.group_number = maxNumber + 1
             } else {
                 this.group_number = maxNumber

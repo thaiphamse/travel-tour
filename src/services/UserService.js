@@ -276,7 +276,6 @@ const checkFreeScheduleUser = async (body) => {
 
     filterOverlappingBookings.map(booking => {
       if (booking.tour_guide) {
-        console.log(booking.tour_guide._id)
         listBusyEmployee.push(booking.tour_guide._id.toString())
       }
 
