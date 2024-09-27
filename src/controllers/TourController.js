@@ -82,11 +82,25 @@ const getFiveMainTour = async (req, res, next) => {
         next(error)
     }
 }
+const getImages = async (req, res, next) => {
+    try {
+
+        let images = await tourService.getImages()
+        return res.status(200).json({
+            status: "OK",
+            message: "SUCCESS",
+            data: images
+        })
+    } catch (error) {
+        next(error)
+    }
+}
 module.exports = {
     createTour,
     getAllTour,
     getOneTour,
     deleteOneTour,
     updateOneTour,
-    getFiveMainTour
+    getFiveMainTour,
+    getImages
 }

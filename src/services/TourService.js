@@ -215,11 +215,25 @@ const getFiveMainTour = async () => {
         throw error
     }
 }
+const getImages = async () => {
+    try {
+        const tours = await tourModel.find({ 'image.type': 'photos' }, { 'image.$': 1 });
+        const photos = tours.flatMap(tour => tour.image);
+
+        return photos;
+
+    } catch (err) {
+        const error = new Error(err.message)
+        err.status = "ERROR"
+        throw error
+    }
+}
 module.exports = {
     createTour,
     getAllTour,
     getOneTour,
     deleteOneTour,
     updateOneTour,
-    getFiveMainTour
+    getFiveMainTour,
+    getImages
 }

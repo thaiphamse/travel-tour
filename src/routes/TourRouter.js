@@ -10,6 +10,7 @@ router.post('/', authMiddleWare, tourController.createTour)
 router.put('/:id', authMiddleWare, tourController.updateOneTour)
 router.delete('/:id', authMiddleWare, tourController.deleteOneTour)
 router.get('/main', tourController.getFiveMainTour)
+router.get('/images', tourController.getImages)
 router.get('/:id', tourController.getOneTour)
 router.get('/', tourController.getAllTour)
 module.exports = router;
