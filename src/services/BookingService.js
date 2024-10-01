@@ -252,11 +252,24 @@ const getBookings = async (query) => {
 
     const filteredBookings = bookings.filter(booking => booking.tour_id !== null);
     return { booking: filteredBookings, sort, sortBy, totalPage, limit }
-
 }
-const getBookingsByGroup = async ({ groupNumber, tour }) => {
+const getBookingsByGroup = async ({ groupNumber, tour, start_date }) => {
+    const filter = {}
+    if (!tour ||
+        !start_date
+    ) {
+        const error = new Error("The input is required");
+        error.status = "ERROR";
+        error.statusCode = 400
+        throw error;
+    }
+    filter.start_date = start_date
+
+    filter.tour_id = tour
     if (groupNumber) {
-        return await bookingModel.find({ tour_id: tour, group_number: groupNumber })
+        filter.group_number = groupNumber
+        return await bookingModel
+            .find(filter)
             .populate('tour_id tour_guide');
     }
     // Tìm tất cả các số nhóm khác nhau
@@ -269,7 +282,15 @@ const getBookingsByGroup = async ({ groupNumber, tour }) => {
     ]);
     //Truy vấn tất cả các booking trong từng nhóm
     const groupNumbers = groups.map(group => group._id);
-    const bookingsGrouped = await bookingModel.find({ tour_id: tour, group_number: { $in: groupNumbers } })
+
+    const bookingsGrouped = await bookingModel
+        .find({
+            tour_id: tour,
+            start_date: filter.start_date,
+            group_number: {
+                $in: groupNumbers
+            }
+        })
         .populate('tour_id tour_guide');
 
     // Bước 3: Tạo cấu trúc dữ liệu nhóm và booking
@@ -279,8 +300,8 @@ const getBookingsByGroup = async ({ groupNumber, tour }) => {
     }));
 
     return result;
-
 }
+
 const updatePaymentInfo = async (params, data) => {
     const { transactionId } = data
     const id = params.id || null
@@ -424,7 +445,6 @@ module.exports = {
     getBookings,
     updatePaymentInfo,
     getMyBooking,
-    // checkFreeScheduleUser,
     getBookingsByGroup,
     assignmentGuideToBookings
 }
