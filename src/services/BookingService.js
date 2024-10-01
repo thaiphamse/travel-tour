@@ -400,12 +400,14 @@ const getMyBooking = async (query, body) => {
 //     }
 // }
 const assignmentGuideToBookings = async (data) => {
-    const group_number = data.group_number
     const tour_guide_id = data.tour_guide_id
+    const start_date = data.start_date
+    const end_date = data.end_date
     const tour_id = data.tour_id
 
-    if (!group_number ||
-        !tour_guide_id ||
+    if (!tour_guide_id ||
+        !start_date ||
+        !end_date ||
         !tour_id) {
         const error = new Error("The input is required");
         error.status = "ERROR";
@@ -424,7 +426,8 @@ const assignmentGuideToBookings = async (data) => {
         // Lấy ra các thông tin khách hàng trong 1 đoàn để update tour_guide
         return await bookingModel.updateMany(
             {
-                group_number: group_number,
+                start_date,
+                end_date,
                 tour_id: tour_id
             },
             { tour_guide: tourGuide },

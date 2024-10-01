@@ -110,7 +110,7 @@ bookingSchema.pre('save', async function (next) {
                 //Lấy tour_guide cũ 
                 const bookingOld = await mongoose.model('Booking')
                     .findOne({
-                        tour_id: this.tour_id,
+                        ...filter,
                         group_number: this.group_number
                     })
                     .select('tour_guide')
