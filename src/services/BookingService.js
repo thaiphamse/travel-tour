@@ -18,7 +18,8 @@ const createBooking = async (data) => {
         payment_method_name,
         start_date,
         end_date,
-        note
+        note,
+        address
     } = data
 
     if (!tour_id ||
@@ -27,7 +28,8 @@ const createBooking = async (data) => {
         !phone ||
         !fullname ||
         !adult_ticket ||
-        !payment_method_name) {
+        !payment_method_name ||
+        !address) {
         const error = new Error('The input in required!');
         error.status = "ERROR"
         error.statusCode = 400; // Bad Request
@@ -55,7 +57,8 @@ const createBooking = async (data) => {
         total_price,
         start_date,
         end_date,
-        note
+        note,
+        address
     })
     const hotelInfo = await booking.getHotelInfo(); // Sử dụng phương thức tùy chỉn
     const bookingObject = booking.toObject({ virtuals: true });
