@@ -101,7 +101,7 @@ const getBookingsByGroup = async (req, res, next) => {
                 status: "OK",
                 message: "SUCCESS",
                 data: {
-                    group_number: req.query.gn,
+                    group_number: parseInt(req.query.gn),
                     bookings: bookingsFilter
                 }
             })
