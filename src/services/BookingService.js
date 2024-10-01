@@ -17,7 +17,8 @@ const createBooking = async (data) => {
         child_ticket,
         payment_method_name,
         start_date,
-        end_date
+        end_date,
+        note
     } = data
 
     if (!tour_id ||
@@ -53,7 +54,8 @@ const createBooking = async (data) => {
         payment_method_name,
         total_price,
         start_date,
-        end_date
+        end_date,
+        note
     })
     const hotelInfo = await booking.getHotelInfo(); // Sử dụng phương thức tùy chỉn
     const bookingObject = booking.toObject({ virtuals: true });

@@ -56,6 +56,9 @@ const bookingSchema = new mongoose.Schema(
         end_date: {
             type: Date
         },
+        note: {
+            type: String
+        }
     },
     {
         timestamps: true,
