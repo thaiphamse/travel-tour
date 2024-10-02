@@ -3,9 +3,9 @@ const tourModel = require("../models/TourModel");
 const bcrypt = require("bcrypt");
 const { genneralAccessToken, genneralRefreshToken } = require("./JwtService");
 const bookingModel = require('../models/BookingModel');
-const { default: mongoose } = require("mongoose");
 const moment = require('moment')
 moment.locale('vi')
+const JwtService = require('../services/JwtService')
 const createUser = (newUser) => {
   return new Promise(async (resolve, reject) => {
     const { name, email, password, confirmPassword, phone, avatar } = newUser;
@@ -281,6 +281,35 @@ const checkFreeScheduleUser = async (body) => {
     throw err
   }
 }
+const getGroupTourEmployeeLead = async (req, query) => {
+  // Lấy id người dùng
+  const sdate = query.start_date
+
+  if (!sdate) {
+    const error = new Error("Vui lòng chọn ngày khởi hành!");
+    error.status = "ERROR";
+    error.statusCode = 400
+    throw error;
+  }
+
+  try {
+    const token = req.headers?.token?.split("Bearer ")[1];
+    const decoded = JwtService.getPayloadFromToken(token)
+    let userId = decoded.id
+    //Tìm userid trong db
+    return await bookingModel.find({
+      tour_guide: userId,
+      start_date: sdate
+    })
+    return userId
+  } catch (error) {
+    const err = new Error()
+    err.status = "ERROR"
+    err.statusCode = 500
+    err.message = error.message
+    throw err
+  }
+}
 module.exports = {
   createUser,
   loginUser,
@@ -290,5 +319,6 @@ module.exports = {
   getDetailUser,
   deleteManyUser,
   updatePassword,
-  checkFreeScheduleUser
+  checkFreeScheduleUser,
+  getGroupTourEmployeeLead
 };

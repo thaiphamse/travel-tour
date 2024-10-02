@@ -86,6 +86,7 @@ const getBookDetail = async (params) => {
     bookingObject.hotel_info = hotelInfo
     return bookingObject
 }
+
 const updateBooking = async (params, data) => {
     const id = params.id || null
 
@@ -142,8 +143,9 @@ const updateBooking = async (params, data) => {
         const currentGroupTotalTickets = bookingsInGroup.reduce((sum, booking) => {
             return sum + booking.adult_ticket + booking.child_ticket;
         }, 0);
+
         let thisNewTicket = booking.adult_ticket + booking.child_ticket
-        console.log(currentGroupTotalTickets, thisNewTicket, maxNumber)
+
         if ((currentGroupTotalTickets + thisNewTicket) > 10) {
             // Cập nhật group_number cho booking mới
             booking.group_number = maxNumber + 1
