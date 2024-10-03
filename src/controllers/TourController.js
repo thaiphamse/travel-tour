@@ -1,3 +1,4 @@
+const tour = require('../models/TourModel')
 const tourService = require('../services/TourService')
 const createTour = async (req, res, next) => {
     try {
@@ -23,8 +24,8 @@ const getAllTour = async (req, res, next) => {
             sortBy: tours.sortBy,
             sort: tours.sort,
             limit: parseInt(tours.limit),
-            countThisPage: tours.tours.length,
-            data: tours.tours
+            countThisPage: tours?.tours?.length,
+            data: tours?.tours
         })
     } catch (error) {
         next(error)

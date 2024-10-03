@@ -141,8 +141,15 @@ const getAllBlog = ({ id, query }) => {
                 .populate('category')
 
             if (places.length == 0)
-                reject({
-                    message: "NOT FOUND",
+                resolve({
+                    status: "OK",
+                    message: "Success",
+                    currentPage: parseInt(page),
+                    totalPage,
+                    sortBy,
+                    sort,
+                    countThisPage: 0,
+                    data: []
                 })
             resolve({
                 status: "OK",

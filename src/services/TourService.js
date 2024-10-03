@@ -25,7 +25,8 @@ const createTour = async (tourData) => {
         !transportation ||
         !start_location ||
         !end_location ||
-        schedules.length === 0) {
+        schedules.length === 0 ||
+        provinceId.length === 0) {
 
         const error = new Error('The input in required!');
         error.status = "ERROR"
@@ -85,13 +86,6 @@ const getAllTour = async (query) => {
     const filter = {}
     const skip = (page - 1) * limit;
 
-    // const validCategoryId = mongoose.Types.ObjectId.isValid(category) ? new mongoose.Types.ObjectId(category) : null;
-    // if (!validCategoryId) {
-    //     const error = new Error("Invalid Category ID format");
-    //     error.status = "ERROR";
-    //     error.statusCode = 400
-    //     throw error;
-    // }
     // Lọc theo id tỉnh
     if (provinceId) {
         filter.provinceId = provinceId
@@ -115,10 +109,15 @@ const getAllTour = async (query) => {
             .populate('category')
 
         if (tours.length === 0) {
-            const error = new Error("Not found tour");
-            error.status = "ERROR"
-            error.statusCode = 404
-            throw error;
+            return {
+                total,
+                totalPage,
+                currentPage: parseInt(page),
+                sortBy,
+                sort,
+                tours: [],
+                limit
+            }
         }
         return {
             total,
