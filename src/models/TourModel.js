@@ -49,7 +49,12 @@ const TourSchema = new mongoose.Schema(
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Category-tour'
-    }
+    },
+    provinceId: [
+      {
+        type: Number,
+      }
+    ],
   },
   {
     timestamps: true,

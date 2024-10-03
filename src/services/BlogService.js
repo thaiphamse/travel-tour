@@ -112,6 +112,7 @@ const getAllBlog = ({ id, query }) => {
         const sortBy = query.sortBy || "createdAt"
         const provinceId = Number(query.provinceId) || null;
         const name = query.name || null
+        const category = query.category || null
         const type = query.type || null
         const filter = {}
         const skip = (page - 1) * limit;
@@ -119,6 +120,10 @@ const getAllBlog = ({ id, query }) => {
         if (provinceId) {
             filter.provinceId = provinceId
         }
+
+        if (category)
+            filter.category = category;
+
         if (type) {
             filter.type = type
         }

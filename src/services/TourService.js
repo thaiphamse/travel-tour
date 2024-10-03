@@ -15,7 +15,8 @@ const createTour = async (tourData) => {
         hotel_level,
         schedules,
         image,
-        category } = tourData
+        category, provinceId } = tourData
+
 
     if (!tour_code ||
         !name ||
@@ -67,7 +68,8 @@ const createTour = async (tourData) => {
         hotel_level,
         schedules,
         image,
-        category
+        category,
+        provinceId
     })
     return await tourSaved.populate('category')
 }
@@ -79,8 +81,17 @@ const getAllTour = async (query) => {
     const provinceId = Number(query.provinceId) || null;
     const name = query.name || null
     const tour_code = query.code || null
+    const category = query.category || null
     const filter = {}
     const skip = (page - 1) * limit;
+
+    // const validCategoryId = mongoose.Types.ObjectId.isValid(category) ? new mongoose.Types.ObjectId(category) : null;
+    // if (!validCategoryId) {
+    //     const error = new Error("Invalid Category ID format");
+    //     error.status = "ERROR";
+    //     error.statusCode = 400
+    //     throw error;
+    // }
     // Lọc theo id tỉnh
     if (provinceId) {
         filter.provinceId = provinceId
@@ -89,6 +100,9 @@ const getAllTour = async (query) => {
     // Lọc theo tên
     if (name)
         filter.name = { $regex: name, $options: 'i' };
+
+    if (category)
+        filter.category = category;
     if (tour_code)
         filter.tour_code = tour_code.toUpperCase()
     try {
