@@ -13,7 +13,7 @@ const TourSchema = new mongoose.Schema(
       url: String,
       type: {
         type: String,
-        enum: ["banner", "photos"]
+        enum: ["banner", "photos", "slide"]
       }
     }],
     name: { type: String, required: true },
@@ -55,6 +55,10 @@ const TourSchema = new mongoose.Schema(
         type: Number,
       }
     ],
+    view: {
+      type: Number,
+      default: 0
+    }
   },
   {
     timestamps: true,

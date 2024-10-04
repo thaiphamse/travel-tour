@@ -24,6 +24,10 @@ const blogSchema = new mongoose.Schema(
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Category'
+    },
+    view: {
+      type: Number,
+      default: 0
     }
   },
   {

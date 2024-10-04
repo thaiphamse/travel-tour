@@ -169,24 +169,33 @@ const getAllBlog = ({ id, query }) => {
 const getOneBlog = (id) => {
     return new Promise(async (resolve, reject) => {
         const filter = { _id: id }
-        console.log(filter)
+        // console.log(filter)
         try {
-            let place = await blogModel.findOne(filter).populate('category')
-            if (!place) {
+            //Tăng view
+            let blog = await blogModel
+                .findOneAndUpdate(
+                    filter,
+                    { $inc: { view: 1 } },
+                )
+                .populate('category')
+            if (!blog) {
                 reject({
                     status: "OK",
                     message: "NO DATA FOUND",
+                    data: []
                 })
             }
+
             resolve({
                 status: "OK",
                 message: "SUCCESS",
-                data: place
+                data: blog
             })
         } catch (error) {
             reject({
                 message: error.message,
-                status: "ERROR"
+                status: "ERROR",
+                data: []
             })
         }
     })

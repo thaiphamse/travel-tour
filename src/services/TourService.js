@@ -29,31 +29,27 @@ const createTour = async (tourData) => {
         provinceId.length === 0) {
 
         const error = new Error('The input in required!');
-        error.status = "ERROR"
-        error.statusCode = 400; // Bad Request
+        error.status = 400
         throw error;
     }
     if (category) {
         const validId = mongoose.Types.ObjectId.isValid(category) ? new mongoose.Types.ObjectId(category) : null;
         if (!validId) {
             const error = new Error("Invalid category ID format");
-            error.status = "ERROR";
-            error.statusCode = 400
+            error.status = 400
             throw error;
         }
     }
     let categoryDb = await categoryTour.findOne({ _id: category })
     if (!categoryDb) {
         const error = new Error("Category is not found");
-        error.status = "ERROR";
-        error.statusCode = 404
+        error.status = 404
         throw error;
     }
     const tour = await tourModel.findOne({ tour_code: tour_code })
     if (tour) {
         const error = new Error('Trùng giá trị tour code!');
-        error.status = "ERROR"
-        error.statusCode = 400; // Bad Request
+        error.status = 400
         throw error;
     }
     let tourSaved = await tourModel.create({
@@ -97,8 +93,10 @@ const getAllTour = async (query) => {
 
     if (category)
         filter.category = category;
+
     if (tour_code)
         filter.tour_code = tour_code.toUpperCase()
+
     try {
         let total = await tourModel.count(filter)
         let totalPage = Math.ceil(total / limit)
@@ -129,9 +127,7 @@ const getAllTour = async (query) => {
             limit
         }
     } catch (err) {
-        const error = new Error(err.message);
-        error.status = "ERROR"
-        throw error;
+        throw err;
     }
 }
 
@@ -140,23 +136,28 @@ const getOneTour = async (params) => {
         const id = params.id || null
         if (!id) {
             const error = new Error("The input in required");
-            error.status = "ERROR"
-            error.statusCode = 400
+            error.status = 400
             throw error;
         }
-        const tour = await tourModel.findOne({ _id: id }).populate('category')
+        const tour = await tourModel
+            .findOneAndUpdate(
+                { _id: id },
+                {
+                    $inc: {
+                        view: 1
+                    }
+                },
+            )
+            .populate('category')
 
         if (!tour) {
             const error = new Error("Not found tour!");
-            error.status = "ERROR"
-            error.statusCode = 404
+            error.status = 404
             throw error;
         }
         return tour
     } catch (err) {
-        const error = new Error(err.message);
-        error.status = "ERROR"
-        throw error;
+        throw err;
     }
 }
 const deleteOneTour = async (id) => {
@@ -164,8 +165,7 @@ const deleteOneTour = async (id) => {
 
         if (!id) {
             const error = new Error("The input in required");
-            error.status = "ERROR"
-            error.statusCode = 400
+            error.status = 400
             throw error;
         }
         //Xóa tất cả booking của tour này
@@ -174,9 +174,7 @@ const deleteOneTour = async (id) => {
         })
         return await tourModel.deleteOne({ _id: new mongoose.Types.ObjectId(id) })
     } catch (err) {
-        const error = new Error(err.message)
-        err.status = "ERROR"
-        throw error
+        throw err
     }
 }
 const updateOneTour = async (params, body) => {
@@ -187,8 +185,7 @@ const updateOneTour = async (params, body) => {
         const validId = mongoose.Types.ObjectId.isValid(id) ? new mongoose.Types.ObjectId(id) : null;
         if (!validId) {
             const error = new Error("Invalid ID format");
-            error.status = "ERROR";
-            error.statusCode = 400
+            error.status = 400
             throw error;
         }
         const tour = await tourModel.findOne({
@@ -197,18 +194,21 @@ const updateOneTour = async (params, body) => {
         })
         if (tour) {
             const error = new Error('Trùng giá trị tour code!');
-            error.status = "ERROR"
-            error.statusCode = 400; // Bad Request
+            error.status = 400
             throw error;
         }
 
+
         let updated = await tourModel.findByIdAndUpdate(validId, body, { new: true })
+        if (!updated) {
+            const error = new Error('Tour is not found');
+            error.status = 404
+            throw error;
+        }
         return await updated.populate('category')
 
     } catch (err) {
-        const error = new Error(err.message)
-        err.status = "ERROR"
-        throw error
+        throw err
     }
 }
 const getFiveMainTour = async () => {
@@ -223,9 +223,7 @@ const getFiveMainTour = async () => {
         return tours;
 
     } catch (err) {
-        const error = new Error(err.message)
-        err.status = "ERROR"
-        throw error
+        throw err
     }
 }
 const getImages = async () => {
@@ -236,10 +234,29 @@ const getImages = async () => {
         return photos;
 
     } catch (err) {
-        const error = new Error(err.message)
-        err.status = "ERROR"
-        throw error
+        throw err
     }
+}
+const getTourSlides = async (query) => {
+    try {
+        const limit = query.limit || 5
+
+        return await tourModel
+            .find({
+            })
+            .limit(limit)
+            .select({
+                name: 1,
+                base_price_adult: 1,
+                category: 1,
+                image: { $elemMatch: { type: 'slide' } }
+            })
+            .populate('category', 'name')
+            .sort({ view: 'desc' }); // Sắp xếp theo lượt view giảm dần
+    } catch (err) {
+        throw err;
+    }
+
 }
 module.exports = {
     createTour,
@@ -248,5 +265,6 @@ module.exports = {
     deleteOneTour,
     updateOneTour,
     getFiveMainTour,
-    getImages
+    getImages,
+    getTourSlides
 }

@@ -31,15 +31,13 @@ const createBooking = async (data) => {
         !payment_method_name ||
         !address) {
         const error = new Error('The input in required!');
-        error.status = "ERROR"
-        error.statusCode = 400; // Bad Request
+        error.status = 400
         throw error;
     }
     const validId = mongoose.Types.ObjectId.isValid(tour_id) ? new mongoose.Types.ObjectId(tour_id) : null;
     if (!validId) {
         const error = new Error("Invalid ID format");
-        error.status = "ERROR";
-        error.statusCode = 400
+        error.status = 400
         throw error;
     }
     let total_price = await calculateTotalPrice({ tour_id: validId, hotel_level, adult_ticket, child_ticket })
@@ -69,15 +67,13 @@ const getBookDetail = async (params) => {
     const id = params.id || null
     if (!id) {
         const error = new Error('The input in required!');
-        error.status = "ERROR"
-        error.statusCode = 400; // Bad Request
+        error.status = 400
         throw error;
     }
     const validId = mongoose.Types.ObjectId.isValid(id) ? new mongoose.Types.ObjectId(id) : null;
     if (!validId) {
         const error = new Error("Invalid ID format");
-        error.status = "ERROR";
-        error.statusCode = 400
+        error.status = 400
         throw error;
     }
     const booking = await bookingModel.findById(validId).populate('hotel_level tour_id tour_guide')
@@ -92,15 +88,13 @@ const updateBooking = async (params, data) => {
 
     if (!id) {
         const error = new Error('The input in required!');
-        error.status = "ERROR"
-        error.statusCode = 400; // Bad Request
+        error.status = 400
         throw error;
     }
     const validId = mongoose.Types.ObjectId.isValid(id) ? new mongoose.Types.ObjectId(id) : null;
     if (!validId) {
         const error = new Error("Invalid ID format");
-        error.status = "ERROR";
-        error.statusCode = 400
+        error.status = 400
         throw error;
     }
 
@@ -108,8 +102,7 @@ const updateBooking = async (params, data) => {
         const { role } = await userModel.findOne({ _id: data.tour_guide }).select('role')
         if (role !== 'employee') {
             const error = new Error('Không thể phân công admin');
-            error.status = "ERROR"
-            error.statusCode = 400;
+            error.status = 400
             throw error;
         }
     }
@@ -160,8 +153,7 @@ const updateBooking = async (params, data) => {
 
     if (!updateBooking) {
         const error = new Error('Not found booking');
-        error.status = "ERROR"
-        error.statusCode = 404;
+        error.status = 404
         throw error;
     }
     return updateBooking
@@ -180,8 +172,7 @@ const calculateTotalPrice = async (
     if (!tour) {
         let error = new Error()
         error.message = "Tour not found"
-        error.status = "ERROR";
-        error.statusCode = 404
+        error.status = 404
         throw error;
     }
     // Tìm giá khách sạn
@@ -266,8 +257,7 @@ const getBookingsByGroup = async ({ groupNumber, tour, start_date }) => {
         !start_date
     ) {
         const error = new Error("The input is required");
-        error.status = "ERROR";
-        error.statusCode = 400
+        error.status = 400
         throw error;
     }
     filter.start_date = start_date
@@ -314,16 +304,14 @@ const updatePaymentInfo = async (params, data) => {
     const id = params.id || null
     if (!id || !transactionId) {
         const error = new Error('The input in required!');
-        error.status = "ERROR"
-        error.statusCode = 400; // Bad Request
+        error.status = 400
         throw error;
     }
     // check a valid id
     const validId = mongoose.Types.ObjectId.isValid(id) ? new mongoose.Types.ObjectId(id) : null;
     if (!validId) {
         const error = new Error("Invalid ID format");
-        error.status = "ERROR";
-        error.statusCode = 400
+        error.status = 400
         throw error;
     }
 
@@ -331,8 +319,7 @@ const updatePaymentInfo = async (params, data) => {
 
     if (!bookingDb) {
         const error = new Error('Booking not found');
-        error.status = "ERROR"
-        error.statusCode = 404; // Bad Request
+        error.status = 404
         throw error;
     }
     //update info
@@ -341,8 +328,7 @@ const updatePaymentInfo = async (params, data) => {
     let updated = await bookingDb.save()
     if (!updated) {
         const error = new Error("Somethings were wrong");
-        error.status = "ERROR";
-        error.statusCode = 500; // Bad Request
+        error.status = 500
         throw error;
     }
     return updated
@@ -417,8 +403,7 @@ const assignmentGuideToBookings = async (data) => {
         !end_date ||
         !tour_id) {
         const error = new Error("The input is required");
-        error.status = "ERROR";
-        error.statusCode = 400
+        error.status = 400
         throw error;
     }
 
@@ -426,8 +411,7 @@ const assignmentGuideToBookings = async (data) => {
         const tourGuide = await userModel.findOne({ _id: tour_guide_id })
         if (!tourGuide) {
             const error = new Error("Tour guide is not found!");
-            error.status = "ERROR";
-            error.statusCode = 404
+            error.status = 404
             throw error;
         }
         // Lấy ra các thông tin khách hàng trong 1 đoàn để update tour_guide
@@ -442,10 +426,7 @@ const assignmentGuideToBookings = async (data) => {
         )
         // return await
     } catch (err) {
-        const error = new Error(err.message);
-        error.status = "ERROR";
-        error.statusCode = 500
-        throw error;
+        throw err;
     }
 }
 module.exports = {

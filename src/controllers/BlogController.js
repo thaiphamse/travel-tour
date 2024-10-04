@@ -137,6 +137,7 @@ const getOneBlog = (req, res) => {
         data: {}
       });
     }
+
     blogService.getOneBlog(idPlace)
       .then(response => {
         res.status(200).json(response)

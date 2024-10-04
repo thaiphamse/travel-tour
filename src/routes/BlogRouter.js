@@ -5,10 +5,10 @@ const {
   authMiddleWare,
 } = require("../MiddleWare/authMiddleWare");
 
-router.get('/', blogController.getAllBlog)
-router.get('/:id', blogController.getOneBlog)
 router.post('/', authMiddleWare, blogController.createBlog)
 router.put('/:id', authMiddleWare, blogController.updateBlog)
 router.delete('/:id', authMiddleWare, blogController.deleteBlog)
+router.get('/:id', blogController.getOneBlog)
+router.get('/', blogController.getAllBlog)
 
 module.exports = router;

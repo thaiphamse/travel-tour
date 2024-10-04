@@ -1,4 +1,3 @@
-const tour = require('../models/TourModel')
 const tourService = require('../services/TourService')
 const createTour = async (req, res, next) => {
     try {
@@ -93,6 +92,21 @@ const getImages = async (req, res, next) => {
             data: images
         })
     } catch (error) {
+        console.log(error.message)
+        next(error)
+    }
+}
+const getTourSlides = async (req, res, next) => {
+    try {
+
+        let images = await tourService.getTourSlides(req.query)
+        return res.status(200).json({
+            status: "OK",
+            message: "SUCCESS",
+            data: images
+        })
+    } catch (error) {
+        console.log(error.message)
         next(error)
     }
 }
@@ -103,5 +117,6 @@ module.exports = {
     deleteOneTour,
     updateOneTour,
     getFiveMainTour,
-    getImages
+    getImages,
+    getTourSlides
 }
