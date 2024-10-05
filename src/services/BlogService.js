@@ -1,6 +1,7 @@
 const { default: mongoose } = require("mongoose");
 const blogModel = require("../models/BlogModel");
 const categoryModel = require('../models/CategoryModel')
+const tourModel = require('../models/TourModel')
 // CRUD
 const createBlog = (newBlogData) => {
     return new Promise(async (resolve, reject) => {
@@ -186,10 +187,25 @@ const getOneBlog = (id) => {
                 })
             }
 
+            //Lấy tour gợi ý theo mã tỉnh
+            let provinceIdDb = blog.provinceId
+            let rs = blog.toObject()
+            rs.tourSuggest = []
+            if (provinceIdDb) {
+                //Lấy tour theo mã tỉnh
+                let tours = await tourModel
+                    .find({
+                        provinceId: provinceIdDb
+                    })
+                    .populate('category')
+                    .select('-schedules -base_price_child')
+                console.log(tours)
+                rs.tourSuggest = tours
+            }
             resolve({
                 status: "OK",
                 message: "SUCCESS",
-                data: blog
+                data: rs
             })
         } catch (error) {
             reject({
