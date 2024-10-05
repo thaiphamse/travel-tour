@@ -212,7 +212,11 @@ const getBookings = async (query) => {
     const filter = {}
     const filterFind = {}
     const skip = (page - 1) * limit;
+    const status = query.status || null
 
+    if (status) {
+        filterFind.payment_status = status
+    }
     // Lọc theo tour code
     if (tour_code) {
         filter.tour_code = tour_code
