@@ -242,6 +242,7 @@ const getTourSlides = async (query) => {
 
         return await tourModel
             .find({
+                image: { $elemMatch: { type: 'slide' } } // Only include tours with at least one 'slide' image
             })
             .limit(limit)
             .select({
@@ -251,7 +252,8 @@ const getTourSlides = async (query) => {
                 image: { $elemMatch: { type: 'slide' } }
             })
             .populate('category', 'name')
-            .sort({ view: 'desc' }); // Sắp xếp theo lượt view giảm dần
+            .sort({ view: 'desc' });
+        // Sắp xếp theo lượt view giảm dần
     } catch (err) {
         throw err;
     }
