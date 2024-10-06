@@ -4,11 +4,10 @@ const categoryTourModel = require('../models/CategoryTourModel')
 const create = async (data) => {
     const name = data.name || null
     const thumbnail = data.thumbnail || null
-    const description = data.description || null
 
     if (!name ||
-        !thumbnail ||
-        !description) {
+        !thumbnail
+    ) {
         const error = new Error('The input in required!');
         error.status = "ERROR";
         error.statusCode = 400
@@ -43,7 +42,35 @@ const getAll = async () => {
 
     // const filteredComments = comments.filter(comment => comment.tour !== null);
 
-    return await categoryTourModel.find()
+    const categories = await categoryTourModel.aggregate([
+        {
+            // Thực hiện lookup để lấy các tour liên quan đến category
+            $lookup: {
+                from: "tours", // Tên collection của tour trong MongoDB (nếu là TourModel thì tên collection mặc định sẽ là 'tours')
+                localField: "_id", // Trường trong collection category
+                foreignField: "category", // Trường liên kết trong collection tour
+                as: "tours" // Tên của mảng chứa các tour được trả về
+            }
+        },
+        {
+            // Thêm một trường "tour_count" để đếm số lượng tours trong mỗi category
+            $addFields: {
+                tour_count: { $size: "$tours" } // Đếm số lượng phần tử trong mảng "tours"
+            }
+        },
+        {
+            // Tùy chọn: chỉ trả về các trường cần thiết
+            $project: {
+                name: 1, // Giả sử bạn có trường "name" trong category
+                tour_count: 1,
+                description: 1,
+                thumbnail: 1
+            }
+        }
+    ]);
+
+    return categories;
+
 
 }
 const deleteOne = async (params) => {

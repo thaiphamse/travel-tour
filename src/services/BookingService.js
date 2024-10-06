@@ -41,7 +41,6 @@ const createBooking = async (data) => {
         throw error;
     }
     let total_price = await calculateTotalPrice({ tour_id: validId, hotel_level, adult_ticket, child_ticket })
-
     //Phân công nhân sự
     let booking = await bookingModel.create({
         tour_id,
@@ -257,16 +256,16 @@ const getBookings = async (query) => {
 }
 const getBookingsByGroup = async ({ groupNumber, tour, start_date }) => {
     const filter = {}
-    if (!tour ||
-        !start_date
-    ) {
-        const error = new Error("The input is required");
-        error.status = 400
-        throw error;
-    }
-    filter.start_date = start_date
+    // if (!tour ||
+    //     !start_date
+    // ) {
+    //     const error = new Error("The input is required");
+    //     error.status = 400
+    //     throw error;
+    // }
+    // filter.start_date = start_date
 
-    filter.tour_id = tour
+    // filter.tour_id = tour
     if (groupNumber) {
         filter.group_number = groupNumber
         return await bookingModel
@@ -274,33 +273,121 @@ const getBookingsByGroup = async ({ groupNumber, tour, start_date }) => {
             .populate('tour_id tour_guide');
     }
     // Tìm tất cả các số nhóm khác nhau
-    const groups = await bookingModel.aggregate([
+    const tours = await bookingModel.aggregate([
         {
             $group: {
-                _id: '$group_number'
+                _id: '$tour_id'
             }
         }
     ]);
+
+    let dataRes = []
+    for (const tour of tours) {
+
+        const group_numbers = await bookingModel.aggregate([
+            {
+                // Điều kiện để lọc các booking theo tour_id
+                $match: {
+                    tour_id: tour._id
+                }
+            },
+            {
+                // Nhóm kết quả theo group_number
+                $group: {
+                    _id: '$group_number' // Nhóm theo group_number
+                }
+            }
+        ]);
+        //group_numbers là danh sách số nhóm theo từng tour_id
+        let data = {
+            tour: tour._id
+        }
+        const groupNumbers = group_numbers.map(group => group._id);
+
+        const bookingsGrouped = await bookingModel
+            .find({
+                tour_id: tour._id,
+                // start_date: filter.start_date,
+                group_number: {
+                    $in: groupNumbers
+                }
+            })
+            .populate('tour_id tour_guide');
+        console.log(bookingsGrouped)
+
+        // // Bước 3: Tạo cấu trúc dữ liệu nhóm và booking
+        const result = groupNumbers.map(groupNumber => {
+            // Lọc các bookings thuộc group_number hiện tại
+            const bookingsInGroup = bookingsGrouped.filter(booking => booking.group_number === groupNumber);
+
+            // Nếu có booking trong nhóm, lấy start_date và end_date từ booking đầu tiên
+            let start_date = null;
+            let end_date = null;
+
+            if (bookingsInGroup.length > 0) {
+                start_date = bookingsInGroup[0].start_date;
+                end_date = bookingsInGroup[0].end_date;
+            }
+
+            return {
+                group_number: groupNumber,
+                start_date,
+                end_date,
+                bookings: bookingsInGroup,  // Các booking thuộc nhóm này
+            };
+        });
+        // const result = groupNumbers.map(groupNumber => ({
+        //     group_number: groupNumber,
+        //     bookings: bookingsGrouped.filter(booking => booking.group_number === groupNumber),
+        // }))
+        let tourDb = await tourModel.findById(tour._id)
+        dataRes.push({
+            tour: tourDb,
+            groups: result
+        })
+    }
+    return dataRes
+    /*
     //Truy vấn tất cả các booking trong từng nhóm
     const groupNumbers = groups.map(group => group._id);
 
     const bookingsGrouped = await bookingModel
         .find({
-            tour_id: tour,
-            start_date: filter.start_date,
+            // tour_id: filter.tour_id,
+            // start_date: filter.start_date,
             group_number: {
                 $in: groupNumbers
             }
         })
         .populate('tour_id tour_guide');
 
-    // Bước 3: Tạo cấu trúc dữ liệu nhóm và booking
-    const result = groupNumbers.map(groupNumber => ({
-        group_number: groupNumber,
-        bookings: bookingsGrouped.filter(booking => booking.group_number === groupNumber)
-    }));
+    console.log(bookingsGrouped)
+    // // Bước 3: Tạo cấu trúc dữ liệu nhóm và booking
+    // const result = groupNumbers.map(groupNumber => ({
+    //     group_number: groupNumber,
+    //     bookings: bookingsGrouped.filter(booking => booking.group_number === groupNumber),
 
+    // }));
+    const result = groupNumbers.map(groupNumber => {
+        // Lọc các bookings thuộc group_number hiện tại
+        const bookingsInGroup = bookingsGrouped.filter(booking => booking.group_number === groupNumber);
+
+        // Nếu có booking trong nhóm, lấy start_date và end_date từ booking đầu tiên
+        let start_date = null;
+        let end_date = null;
+
+        if (bookingsInGroup.length > 0) {
+            start_date = bookingsInGroup[0].start_date;
+            end_date = bookingsInGroup[0].end_date;
+        }
+
+        return {
+            group_number: groupNumber,
+            bookings: bookingsInGroup,  // Các booking thuộc nhóm này
+        };
+    });
     return result;
+    */
 }
 
 const updatePaymentInfo = async (params, data) => {
@@ -401,11 +488,13 @@ const assignmentGuideToBookings = async (data) => {
     const start_date = data.start_date
     const end_date = data.end_date
     const tour_id = data.tour_id
+    const group_number = data.group_number
 
     if (!tour_guide_id ||
         !start_date ||
         !end_date ||
-        !tour_id) {
+        !tour_id ||
+        !group_number) {
         const error = new Error("The input is required");
         error.status = 400
         throw error;
@@ -423,6 +512,7 @@ const assignmentGuideToBookings = async (data) => {
             {
                 start_date,
                 end_date,
+                group_number,
                 tour_id: tour_id
             },
             { tour_guide: tourGuide },

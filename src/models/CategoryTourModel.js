@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const categoryTourSchema = new mongoose.Schema(
     {
         name: { type: String, index: true },
-        description: String,
         thumbnail: {
             type: String,
         },

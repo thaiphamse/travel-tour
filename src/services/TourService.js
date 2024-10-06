@@ -214,11 +214,10 @@ const updateOneTour = async (params, body) => {
 const getFiveMainTour = async () => {
     try {
 
-        // Bước 3: Truy vấn thông tin chi tiết của các tour
         const tours = await tourModel
             .find()
             .limit(5)
-            .sort("createdAt desc")
+            .sort({ 'view': 'desc' })
 
         return tours;
 

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const tourModel = require('./TourModel')
+const moment = require('moment')
 const bookingSchema = new mongoose.Schema(
     {
         tour_id: {
@@ -47,8 +48,7 @@ const bookingSchema = new mongoose.Schema(
             ref: 'User'
         },
         group_number: {
-            type: Number,
-            default: 1
+            type: String,
         },
         start_date: {
             type: Date,
@@ -91,26 +91,32 @@ bookingSchema.pre('save', async function (next) {
                 .limit(1)
                 .select('group_number')
 
-            let maxNumber = maxGroupNumber[0]?.group_number || 1
+
+            if (maxGroupNumber.length === 0) {
+                this.group_number = `1-${moment(this.start_date).format('L')}`
+                return next()
+            }
+
+            let maxNumberString = maxGroupNumber[0]?.group_number
+            let maxNumber = maxNumberString.split('-')[0]
+
             // Tìm nhóm hiện tại có số lượng booking
             const bookingsInGroup = await mongoose.model('Booking').find({
                 ...filter,
-                group_number: maxNumber
+                group_number: maxNumberString
             });
+
             // Tính tổng số vé hiện tại trong nhóm
             const currentGroupTotalTickets = bookingsInGroup.reduce((sum, booking) => {
                 return sum + booking.adult_ticket + booking.child_ticket;
             }, 0);
 
-            console.log("tổng số vé hiện tại trong nhóm ", currentGroupTotalTickets)
-            console.log("tổng vé chuẩn bị thêm ", totalTickets)
-
             // Nếu tổng số vé trong nhóm hiện tại cộng với vé mới vượt quá 20
             if ((currentGroupTotalTickets + totalTickets) > 10) {
                 // Cập nhật group_number cho booking mới
-                this.group_number = maxNumber + 1
+                this.group_number = (Number(maxNumber) + 1) + `-${moment(this.start_date).format('L')}`
             } else {
-                this.group_number = maxNumber
+                this.group_number = maxNumberString
 
                 //Phân công nhân sự của nhóm của vào
                 //Lấy tour_guide cũ 
