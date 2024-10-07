@@ -107,7 +107,7 @@ const getBookingsByGroup = async (req, res, next) => {
             })
         }
 
-        const bookings = await bookingService.getBookingsByGroup({ tour: req.query.tour, start_date: req.query.start_date })
+        const bookings = await bookingService.getBookingsByGroup({ tour: req.query.tour, start_date: req.query.start_date, query: req.query })
         const bookingsFilter = bookings.filter(booking => booking.tour_id !== null);
         return res.status(200).json({
             status: "OK",

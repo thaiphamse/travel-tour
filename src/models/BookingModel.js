@@ -45,7 +45,8 @@ const bookingSchema = new mongoose.Schema(
         },
         tour_guide: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'User'
+            ref: 'User',
+            default: null
         },
         group_number: {
             type: String,

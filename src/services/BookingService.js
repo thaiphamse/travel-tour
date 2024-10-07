@@ -3,6 +3,7 @@ const bookingModel = require('../models/BookingModel');
 const tourModel = require('../models/TourModel')
 const userModel = require('../models/UserModel')
 const moment = require('moment');
+const { query } = require('express');
 moment.locale('vi')
 
 const createBooking = async (data) => {
@@ -254,8 +255,7 @@ const getBookings = async (query) => {
     const filteredBookings = bookings.filter(booking => booking.tour_id !== null);
     return { booking: filteredBookings, sort, sortBy, totalPage, limit }
 }
-const getBookingsByGroup = async ({ groupNumber, tour, start_date }) => {
-    const filter = {}
+const getBookingsByGroup = async ({ groupNumber, tour, start_date, query }) => {
     // if (!tour ||
     //     !start_date
     // ) {
@@ -282,8 +282,20 @@ const getBookingsByGroup = async ({ groupNumber, tour, start_date }) => {
     ]);
 
     let dataRes = []
+    let filterBooking = {}
+    const tour_guide = query.tour_guide || null
+    console.log(tour_guide)
+
+    if (tour_guide == 'false') {
+        filterBooking.tour_guide = { $exists: false, $eq: null }
+
+    } else if (tour_guide == 'true') {
+        filterBooking.tour_guide = { $exists: true, $ne: null }
+    }
+
     for (const tour of tours) {
 
+        //Lấy tất cả nhóm của booking
         const group_numbers = await bookingModel.aggregate([
             {
                 // Điều kiện để lọc các booking theo tour_id
@@ -296,12 +308,14 @@ const getBookingsByGroup = async ({ groupNumber, tour, start_date }) => {
                 $group: {
                     _id: '$group_number' // Nhóm theo group_number
                 }
+            },
+            {
+                $sort:
+                    { start_date: 1 }
             }
         ]);
         //group_numbers là danh sách số nhóm theo từng tour_id
-        let data = {
-            tour: tour._id
-        }
+
         const groupNumbers = group_numbers.map(group => group._id);
 
         const bookingsGrouped = await bookingModel
@@ -310,11 +324,16 @@ const getBookingsByGroup = async ({ groupNumber, tour, start_date }) => {
                 // start_date: filter.start_date,
                 group_number: {
                     $in: groupNumbers
-                }
+                },
+                ...filterBooking // Không có tour_guide
             })
-            .populate('tour_id tour_guide');
-        console.log(bookingsGrouped)
+            .populate('tour_id tour_guide')
+            .sort({ 'start_date': 'asc' })
+        console.log(bookingsGrouped, groupNumbers, filterBooking)
 
+        if (bookingsGrouped.length === 0) {
+            continue
+        }
         // // Bước 3: Tạo cấu trúc dữ liệu nhóm và booking
         const result = groupNumbers.map(groupNumber => {
             // Lọc các bookings thuộc group_number hiện tại
@@ -336,10 +355,7 @@ const getBookingsByGroup = async ({ groupNumber, tour, start_date }) => {
                 bookings: bookingsInGroup,  // Các booking thuộc nhóm này
             };
         });
-        // const result = groupNumbers.map(groupNumber => ({
-        //     group_number: groupNumber,
-        //     bookings: bookingsGrouped.filter(booking => booking.group_number === groupNumber),
-        // }))
+
         let tourDb = await tourModel.findById(tour._id)
         dataRes.push({
             tour: tourDb,
@@ -347,47 +363,6 @@ const getBookingsByGroup = async ({ groupNumber, tour, start_date }) => {
         })
     }
     return dataRes
-    /*
-    //Truy vấn tất cả các booking trong từng nhóm
-    const groupNumbers = groups.map(group => group._id);
-
-    const bookingsGrouped = await bookingModel
-        .find({
-            // tour_id: filter.tour_id,
-            // start_date: filter.start_date,
-            group_number: {
-                $in: groupNumbers
-            }
-        })
-        .populate('tour_id tour_guide');
-
-    console.log(bookingsGrouped)
-    // // Bước 3: Tạo cấu trúc dữ liệu nhóm và booking
-    // const result = groupNumbers.map(groupNumber => ({
-    //     group_number: groupNumber,
-    //     bookings: bookingsGrouped.filter(booking => booking.group_number === groupNumber),
-
-    // }));
-    const result = groupNumbers.map(groupNumber => {
-        // Lọc các bookings thuộc group_number hiện tại
-        const bookingsInGroup = bookingsGrouped.filter(booking => booking.group_number === groupNumber);
-
-        // Nếu có booking trong nhóm, lấy start_date và end_date từ booking đầu tiên
-        let start_date = null;
-        let end_date = null;
-
-        if (bookingsInGroup.length > 0) {
-            start_date = bookingsInGroup[0].start_date;
-            end_date = bookingsInGroup[0].end_date;
-        }
-
-        return {
-            group_number: groupNumber,
-            bookings: bookingsInGroup,  // Các booking thuộc nhóm này
-        };
-    });
-    return result;
-    */
 }
 
 const updatePaymentInfo = async (params, data) => {
