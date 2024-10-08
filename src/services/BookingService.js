@@ -472,7 +472,7 @@ const assignmentGuideToBookings = async (data) => {
             throw error;
         }
         // Lấy ra các thông tin khách hàng trong 1 đoàn để update tour_guide
-        return await bookingModel.updateMany(
+        let data = await bookingModel.updateMany(
             {
                 start_date,
                 end_date,
@@ -482,6 +482,13 @@ const assignmentGuideToBookings = async (data) => {
             { tour_guide: tourGuide },
             { new: true }
         )
+        if (data.modifiedCount === 0) {
+            const error = new Error('Không có document nào được cập nhật');
+            error.status = 400;
+            throw error;
+        }
+        return data
+
         // return await
     } catch (err) {
         throw err;
