@@ -298,7 +298,7 @@ const getBookingsByGroup = async ({ query }) => {
     const start_date = query.start_date || null
 
     if (start_date) {
-        filterBooking.start_date = start_date
+        filterBooking.start_date = new Date(start_date)
     }
 
     if (tour_guide === 'false') {
@@ -331,6 +331,7 @@ const getBookingsByGroup = async ({ query }) => {
                     { start_date: 1 }
             }
         ]);
+        console.log(group_numbers)
         //group_numbers là danh sách số nhóm theo từng tour_id
         const groupNumbers = group_numbers.map(group => group._id);
 
@@ -345,7 +346,7 @@ const getBookingsByGroup = async ({ query }) => {
             })
             .populate('tour_id tour_guide')
             .sort({ 'start_date': 'asc' })
-        console.log(bookingsGrouped, groupNumbers, filterBooking)
+        // console.log(bookingsGrouped, groupNumbers, filterBooking)
 
         if (bookingsGrouped.length === 0) {
             continue
