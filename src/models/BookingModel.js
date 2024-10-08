@@ -96,7 +96,7 @@ bookingSchema.pre('save', async function (next) {
 
 
             if (maxGroupNumber.length === 0) {
-                this.group_number = `1-${moment(this.start_date).format('L')}`
+                this.group_number = `1-(${moment(this.start_date).format('L')}->${moment(this.end_date).format('L')})`
                 return next()
             }
 
@@ -117,7 +117,7 @@ bookingSchema.pre('save', async function (next) {
             // Nếu tổng số vé trong nhóm hiện tại cộng với vé mới vượt quá 20
             if ((currentGroupTotalTickets + totalTickets) > 10) {
                 // Cập nhật group_number cho booking mới
-                this.group_number = (Number(maxNumber) + 1) + `-${moment(this.start_date).format('L')}`
+                this.group_number = (Number(maxNumber) + 1) + `-(${moment(this.start_date).format('L')}->${moment(this.end_date).format('L')})`
             } else {
                 this.group_number = maxNumberString
 

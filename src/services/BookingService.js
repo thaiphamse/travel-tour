@@ -84,79 +84,107 @@ const getBookDetail = async (params) => {
 }
 
 const updateBooking = async (params, data) => {
-    const id = params.id || null
+    const session = await mongoose.startSession(); // Bắt đầu phiên giao dịch
+    session.startTransaction(); // Khởi tạo transaction
+    try {
+        const id = params.id || null
 
-    if (!id) {
-        const error = new Error('The input in required!');
-        error.status = 400
-        throw error;
-    }
-    const validId = mongoose.Types.ObjectId.isValid(id) ? new mongoose.Types.ObjectId(id) : null;
-    if (!validId) {
-        const error = new Error("Invalid ID format");
-        error.status = 400
-        throw error;
-    }
-
-    if (data.tour_guide) {
-        const { role } = await userModel.findOne({ _id: data.tour_guide }).select('role')
-        if (role !== 'employee') {
-            const error = new Error('Không thể phân công admin');
+        if (!id) {
+            const error = new Error('The input in required!');
             error.status = 400
             throw error;
         }
+        const validId = mongoose.Types.ObjectId.isValid(id) ? new mongoose.Types.ObjectId(id) : null;
+        if (!validId) {
+            const error = new Error("Invalid ID format");
+            error.status = 400
+            throw error;
+        }
+        //Nếu có ngày thì phần nhóm lại
+        if (data.start_date && data.end_date) {
+            //Tìm xem có nhóm nào xuất phát đúng thời gian này hay không
+            let booking = await bookingModel
+                .findOne({ _id: validId })
+                .select('tour_id child_ticket adult_ticket')
+                .session(session)
+
+            if (!booking) {
+                const error = new Error("Not found booking to update");
+                error.status = 404
+                throw error;
+            }
+            let tour_id = booking.tour_id
+            let filter = {}
+            filter.tour_id = tour_id
+            filter.start_date = data.start_date
+            filter.end_date = data.end_date
+
+            //Lấy ra group_number max trong db theo tour_id và ngày xuất phát, end_date
+            const maxGroupNumber = await mongoose.model('Booking')
+                .find(filter)
+                .sort({ group_number: 'descending' })
+                .limit(1)
+                .select('group_number')
+                .session(session)
+
+            //Đếm số vé có lớn hơn 10 chưa
+            // Tìm nhóm hiện tại có số lượng booking
+            let groupName = `1-(${moment(new Date(filter.start_date)).format("DD/MM/YYYY")}->${moment(new Date(filter.end_date)).format("DD/MM/YYYY")})`;
+
+
+            if (maxGroupNumber.length > 0) {
+                groupName = maxGroupNumber[0].group_number
+            }
+
+            let maxNumber = groupName.split('-')[0]
+            const bookingsInGroup = await bookingModel
+                .find({
+                    ...filter,
+                    group_number: groupName
+                })
+                .session(session)
+            console.log(bookingsInGroup)
+            // Tính tổng số vé hiện tại trong nhóm
+            const currentGroupTotalTickets = bookingsInGroup.reduce((sum, booking) => {
+                return sum + booking.adult_ticket + booking.child_ticket;
+            }, 0);
+
+            let thisNewTicket = booking.adult_ticket + booking.child_ticket
+
+            if ((currentGroupTotalTickets + thisNewTicket) > 10) {
+                // Cập nhật group_number cho booking mới
+                booking.group_number = (Number(maxNumber) + 1) + `-(${moment(new Date(filter.start_date)).format("DD/MM/YYYY")}->${moment(new Date(filter.end_date)).format("DD/MM/YYYY")})`
+            } else {
+                booking.group_number = groupName
+
+                booking.tour_guide = bookingsInGroup[0]?.tour_guide
+            }
+            console.log(booking.group_number, (currentGroupTotalTickets + thisNewTicket))
+            await booking.save({ session })
+            // return
+        }
+        const updateBooking = await bookingModel
+            .findOneAndUpdate({ _id: id }, data, { new: true })
+            .populate('tour_guide tour_id')
+            .session(session)
+
+        if (!updateBooking) {
+            const error = new Error('Not found booking');
+            error.status = 404
+            throw error;
+        }
+        // Commit transaction nếu mọi thứ thành công
+        await session.commitTransaction();
+
+        return updateBooking
+    } catch (error) {
+        await session.abortTransaction();
+        throw error
     }
-
-    //Nếu có ngày thì phần nhóm lại
-    if (data.start_date && data.end_date) {
-        //Tìm xem có nhóm nào xuất phát đúng thời gian này hay không
-        let booking = await bookingModel.findOne({ _id: validId })
-            .select('tour_id child_ticket adult_ticket')
-        let tour_id = booking.tour_id
-        let filter = {}
-        filter.tour_id = tour_id
-        filter.start_date = data.start_date
-        filter.end_date = data.end_date
-        console.log(filter)
-        //Lấy ra group_number max trong db theo tour_id và ngày xuất phát
-        const maxGroupNumber = await mongoose.model('Booking')
-            .find(filter)
-            .sort({ group_number: 'descending' })
-            .limit(1)
-            .select('group_number')
-        //Đếm số vé có lớn hơn 10 chưa
-        // Tìm nhóm hiện tại có số lượng booking
-        let maxNumber = maxGroupNumber[0]?.group_number || 1
-        console.log(maxNumber)
-        const bookingsInGroup = await bookingModel.find({
-            ...filter,
-            group_number: maxNumber
-        });
-        // Tính tổng số vé hiện tại trong nhóm
-        const currentGroupTotalTickets = bookingsInGroup.reduce((sum, booking) => {
-            return sum + booking.adult_ticket + booking.child_ticket;
-        }, 0);
-
-        let thisNewTicket = booking.adult_ticket + booking.child_ticket
-
-        if ((currentGroupTotalTickets + thisNewTicket) > 10) {
-            // Cập nhật group_number cho booking mới
-            booking.group_number = maxNumber + 1
-        } else
-            booking.group_number = maxNumber
-
-        await booking.save()
+    finally {
+        // Kết thúc session dù có lỗi hay không
+        session.endSession();
     }
-    // return
-    const updateBooking = await bookingModel.findOneAndUpdate({ _id: id }, data, { new: true })
-        .populate('tour_guide tour_id')
-
-    if (!updateBooking) {
-        const error = new Error('Not found booking');
-        error.status = 404
-        throw error;
-    }
-    return updateBooking
 }
 
 //Tính tổng giá
