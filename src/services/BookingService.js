@@ -316,7 +316,8 @@ const getBookingsByGroup = async ({ query }) => {
             {
                 // Điều kiện để lọc các booking theo tour_id
                 $match: {
-                    tour_id: tour._id
+                    tour_id: tour._id,
+                    ...filterBooking
                 }
             },
             {
