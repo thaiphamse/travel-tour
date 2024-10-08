@@ -143,7 +143,6 @@ const updateBooking = async (params, data) => {
                     group_number: groupName
                 })
                 .session(session)
-            console.log(bookingsInGroup)
             // Tính tổng số vé hiện tại trong nhóm
             const currentGroupTotalTickets = bookingsInGroup.reduce((sum, booking) => {
                 return sum + booking.adult_ticket + booking.child_ticket;
@@ -159,7 +158,6 @@ const updateBooking = async (params, data) => {
 
                 booking.tour_guide = bookingsInGroup[0]?.tour_guide
             }
-            console.log(booking.group_number, (currentGroupTotalTickets + thisNewTicket))
             await booking.save({ session })
             // return
         }
@@ -298,18 +296,18 @@ const getBookingsByGroup = async ({ query }) => {
     let filterBooking = {}
     const tour_guide = query.tour_guide || null
     const start_date = query.start_date || null
-    console.log(tour_guide)
 
     if (start_date) {
         filterBooking.start_date = start_date
     }
 
-    if (tour_guide == 'false') {
-        filterBooking.tour_guide = { $exists: false, $eq: null }
+    if (tour_guide === 'false') {
+        filterBooking.tour_guide = { $eq: null }
 
-    } else if (tour_guide == 'true') {
+    } else if (tour_guide === 'true') {
         filterBooking.tour_guide = { $exists: true, $ne: null }
     }
+    console.log(filterBooking)
 
     for (const tour of tours) {
 
