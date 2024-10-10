@@ -43,6 +43,9 @@ const bookingSchema = new mongoose.Schema(
             type: String,
             enum: ['vnpay', 'paypal', 'cash']
         },
+        payment_date: {
+            type: Date,
+        },
         tour_guide: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',

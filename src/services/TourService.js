@@ -257,7 +257,27 @@ const getTourSlides = async (query) => {
     } catch (err) {
         throw err;
     }
+}
 
+const getTourFlop = async (req, res) => {
+    try {
+        try {
+
+            const tours = await tourModel
+                .find()
+                .limit(5)
+                .sort({ 'view': 'asc' })
+                .populate('category', 'name')
+                .select('view image name tour_code category')
+
+            return tours;
+
+        } catch (err) {
+            throw err
+        }
+    } catch (error) {
+        throw error
+    }
 }
 module.exports = {
     createTour,
@@ -267,5 +287,6 @@ module.exports = {
     updateOneTour,
     getFiveMainTour,
     getImages,
-    getTourSlides
+    getTourSlides,
+    getTourFlop
 }

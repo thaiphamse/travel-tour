@@ -7,6 +7,7 @@ const bookingRouter = require('./BookingRouter.js')
 const commentRouter = require('./CommentRouter.js')
 const categoryRouter = require('./CategoryRouter.js')
 const categoryTourRouter = require('./CategoryTourRouter.js')
+const statisticalRouter = require('./StatisticalRouter.js')
 
 const routes = (app) => {
   app.use("/api/user", userRouter)
@@ -18,6 +19,7 @@ const routes = (app) => {
   app.use("/api/booking", bookingRouter)
   app.use("/api/category", categoryRouter)
   app.use("/api/category-tour", categoryTourRouter)
+  app.use("/api/statistical", statisticalRouter)
 };
 
 module.exports = routes;

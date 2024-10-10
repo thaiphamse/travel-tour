@@ -408,6 +408,8 @@ const updatePaymentInfo = async (params, data) => {
     //update info
     bookingDb.transactionId = transactionId
     bookingDb.payment_status = "payment_confirmed"
+    bookingDb.payment_date = new Date()
+
     let updated = await bookingDb.save()
     if (!updated) {
         const error = new Error("Somethings were wrong");

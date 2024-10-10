@@ -110,6 +110,19 @@ const getTourSlides = async (req, res, next) => {
         next(error)
     }
 }
+const getTourFlop = async (req, res, next) => {
+    try {
+        const dataRs = await tourService.getTourFlop()
+        res.status(200).json({
+            status: "OK",
+            message: "SUCCESS",
+            data: dataRs
+        })
+    } catch (error) {
+        console.log(error)
+        next(error)
+    }
+}
 module.exports = {
     createTour,
     getAllTour,
@@ -118,5 +131,6 @@ module.exports = {
     updateOneTour,
     getFiveMainTour,
     getImages,
-    getTourSlides
+    getTourSlides,
+    getTourFlop
 }
