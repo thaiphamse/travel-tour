@@ -4,7 +4,7 @@ const tourModel = require('../models/TourModel')
 const userModel = require('../models/UserModel')
 const moment = require('moment');
 const { query } = require('express');
-const booking = require('../models/BookingModel');
+const emailService = require('./EmailService')
 moment.locale('vi')
 
 const createBooking = async (data) => {
@@ -59,9 +59,16 @@ const createBooking = async (data) => {
         note,
         address
     })
+
+
     const hotelInfo = await booking.getHotelInfo(); // Sử dụng phương thức tùy chỉn
     const bookingObject = booking.toObject({ virtuals: true });
     bookingObject.hotel_info = hotelInfo
+    if (booking) {
+        const populatedBooking = await bookingModel.findById(booking._id).populate('tour_id', 'name');
+        //Send mail
+        await emailService.sendEmailCreateOrder({ to: email, data: populatedBooking })
+    }
     return bookingObject
 }
 const getBookDetail = async (params) => {
@@ -87,8 +94,11 @@ const getBookDetail = async (params) => {
 const updateBooking = async (params, data) => {
     const session = await mongoose.startSession(); // Bắt đầu phiên giao dịch
     session.startTransaction(); // Khởi tạo transaction
+
+    const id = params.id || null
+    let updatedBooking //Lưu tt update dùng trong block finally
+    let bk_db
     try {
-        const id = params.id || null
 
         if (!id) {
             const error = new Error('The input in required!');
@@ -114,6 +124,10 @@ const updateBooking = async (params, data) => {
                 error.status = 404
                 throw error;
             }
+
+            bk_db = await bookingModel.findById(id)//Lưu tt status trước khi cập nhật
+                .select('payment_status')
+
             let tour_id = booking.tour_id
             let filter = {}
             filter.tour_id = tour_id
@@ -174,6 +188,7 @@ const updateBooking = async (params, data) => {
         }
         // Commit transaction nếu mọi thứ thành công
         await session.commitTransaction();
+        updatedBooking = updateBooking
 
         return updateBooking
     } catch (error) {
@@ -183,6 +198,10 @@ const updateBooking = async (params, data) => {
         throw error
     }
     finally {
+        if (data.payment_status === 'employee_confirmed' && bk_db.payment_status !== 'employee_confirmed') {
+            console.log('sendmail')
+            await emailService.sendEmailSuccessBooking({ to: updatedBooking.email, data: updatedBooking })
+        }
         // Kết thúc session dù có lỗi hay không
         console.log('End')
 
@@ -283,6 +302,7 @@ const getBookings = async (query) => {
         .limit(limit)
         .skip(skip);
 
+    await emailService.sendEmailCreateOrder({ to: 'thaistar1998@gmail.com', data: [] })
     const filteredBookings = bookings.filter(booking => booking.tour_id !== null);
     return { booking: filteredBookings, sort, sortBy, totalPage, limit }
 }
@@ -415,6 +435,7 @@ const updatePaymentInfo = async (params, data) => {
         error.status = 404
         throw error;
     }
+
     //update info
     bookingDb.transactionId = transactionId
     bookingDb.payment_status = "payment_confirmed"
@@ -427,6 +448,12 @@ const updatePaymentInfo = async (params, data) => {
         error.status = 500
         throw error;
     }
+    let updatedPupulation =
+        await bookingModel
+            .findById(updated._id)
+            .populate('tour_id', 'name')
+
+    await emailService.sendEmailPaymentConfirm({ to: bookingDb.email, data: updatedPupulation })
     return updated
 
 }
