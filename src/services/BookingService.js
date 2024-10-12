@@ -302,7 +302,6 @@ const getBookings = async (query) => {
         .limit(limit)
         .skip(skip);
 
-    await emailService.sendEmailCreateOrder({ to: 'thaistar1998@gmail.com', data: [] })
     const filteredBookings = bookings.filter(booking => booking.tour_id !== null);
     return { booking: filteredBookings, sort, sortBy, totalPage, limit }
 }
