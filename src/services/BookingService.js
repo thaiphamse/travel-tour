@@ -4,6 +4,7 @@ const tourModel = require('../models/TourModel')
 const userModel = require('../models/UserModel')
 const moment = require('moment');
 const { query } = require('express');
+const booking = require('../models/BookingModel');
 moment.locale('vi')
 
 const createBooking = async (data) => {
@@ -118,7 +119,6 @@ const updateBooking = async (params, data) => {
             filter.tour_id = tour_id
             filter.start_date = data.start_date
             filter.end_date = data.end_date
-
             //Lấy ra group_number max trong db theo tour_id và ngày xuất phát, end_date
             const maxGroupNumber = await mongoose.model('Booking')
                 .find(filter)
@@ -127,6 +127,7 @@ const updateBooking = async (params, data) => {
                 .select('group_number')
                 .session(session)
 
+            console.log(filter, maxGroupNumber)
             //Đếm số vé có lớn hơn 10 chưa
             // Tìm nhóm hiện tại có số lượng booking
             let groupName = `1-(${moment(new Date(filter.start_date)).format("DD/MM/YYYY")}->${moment(new Date(filter.end_date)).format("DD/MM/YYYY")})`;
@@ -176,11 +177,15 @@ const updateBooking = async (params, data) => {
 
         return updateBooking
     } catch (error) {
+        console.log('roll back')
+        console.log(error)
         await session.abortTransaction();
         throw error
     }
     finally {
         // Kết thúc session dù có lỗi hay không
+        console.log('End')
+
         session.endSession();
     }
 }
@@ -288,7 +293,12 @@ const getBookingsByGroup = async ({ query }) => {
         {
             $group: {
                 _id: '$tour_id'
-            }
+            },
+
+        },
+        {
+            $sort:
+                { start_date: 1 }
         }
     ]);
 
@@ -408,6 +418,7 @@ const updatePaymentInfo = async (params, data) => {
     //update info
     bookingDb.transactionId = transactionId
     bookingDb.payment_status = "payment_confirmed"
+    bookingDb.payment_method_name = 'paypal'
     bookingDb.payment_date = new Date()
 
     let updated = await bookingDb.save()

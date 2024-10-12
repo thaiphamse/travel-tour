@@ -75,10 +75,12 @@ const getAll = async (query) => {
     if (tour_code)
         filter.tour_code = tour_code.toUpperCase()
 
-    let totalComment = await commentModel.find().populate({
-        path: 'tour', // Trường được liên kết với bảng Tour
-        match: filter, // Điều kiện lọc theo tour_code
-    })
+    let totalComment = await commentModel
+        .find()
+        .populate({
+            path: 'tour', // Trường được liên kết với bảng Tour
+            match: filter, // Điều kiện lọc theo tour_code
+        })
     let filterTotalComment = totalComment.filter(comment => comment.tour !== null)
 
     let totalPage = Math.ceil(filterTotalComment.length / limit)
