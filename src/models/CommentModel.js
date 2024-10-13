@@ -15,11 +15,10 @@ const CommentSchema = new mongoose.Schema(
       }
     },
     phone: { type: String, required: true },
-    content: { type: String },
+    content: { type: String, required: true },
     replyBy: [{
-      adminId: String,
-      fullname: String,
-      content: String
+      adminId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      comment: { type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }
     }],
     tour: {
       type: mongoose.Schema.Types.ObjectId,

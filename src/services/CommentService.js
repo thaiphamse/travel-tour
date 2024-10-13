@@ -76,20 +76,52 @@ const getAll = async (query) => {
     if (tour_code)
         filter.tour_code = tour_code.toUpperCase()
 
+
     let totalComment = await commentModel
         .find()
         .populate({
             path: 'tour', // Trường được liên kết với bảng Tour
             match: filter, // Điều kiện lọc theo tour_code
         })
+
+    let commentIds = []
+    //Lấy tất cả comemnt theo bộ lọc để lấy tất cả adminId trong replyBy
+    for (let comment of totalComment) {
+        let replyArrays = comment.replyBy
+        if (replyArrays.length > 0) {
+            replyArrays.map(obj => {
+                commentIds.push(obj.comment)
+            })
+        }
+
+
+    }
+    console.log(commentIds)
     let filterTotalComment = totalComment.filter(comment => comment.tour !== null)
 
     let totalPage = Math.ceil(filterTotalComment.length / limit)
 
-    const comments = await commentModel.find().populate({
-        path: 'tour', // Trường được liên kết với bảng Tour
-        match: filter, // Điều kiện lọc theo tour_code
-    })
+    const comments = await commentModel
+        .find(
+            {
+                _id: {
+                    $nin: commentIds
+                }
+            }
+        )
+        .populate({
+            path: 'tour', // Trường được liên kết với bảng Tour
+            match: filter, // Điều kiện lọc theo tour_code,
+            select: 'name tour_code'
+        })
+        .populate({
+            path: 'replyBy.adminId', // Populate the admin's details
+            select: 'fullname email phone', // Select specific fields to return
+        })
+        .populate({
+            path: 'replyBy.comment',
+            select: 'content',
+        })
         .sort([[`${sortBy}`, `${sort}`]])
         .limit(limit)
         .skip(skip);
@@ -117,7 +149,6 @@ const deleteOne = async (params) => {
     }
     // check
     let isExistComment = await commentModel.find({ _id: validId }).count()
-    console.log(isExistComment)
     if (isExistComment === 0) {
         const error = new Error("Comment is not found");
         error.status = "ERROR";
@@ -140,16 +171,30 @@ const adminReply = async (params, body, adminId) => {
             throw error;
         }
         if (name) {
+            //Tạo comment
+            let admin = await userModel.findById(adminId)
+            let creatComment = await commentModel.create({
+                fullname: admin.name,
+                email: admin.email,
+                phone: admin.phone,
+                content
+            })
+
             let commentDb = await commentModel.findById(validIdComment)
             commentDb.replyBy.push(
                 {
                     adminId,
-                    fullname: name,
-                    content
+                    comment: creatComment._id
                 }
             )
-            return await commentDb.save()
+            let saved = await commentDb.save()
+            if (creatComment && saved) {
+                return creatComment
+            }
         }
+        const error = new Error('Not found admin id');
+        error.status = 404;
+        throw error;
     } catch (error) {
         throw error
     }
