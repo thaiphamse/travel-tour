@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const tourModel = require('../models/TourModel')
 const commentModel = require('../models/CommentModel')
+const userModel = require('../models/UserModel')
 
 const createComment = async (data) => {
     const {
@@ -125,10 +126,40 @@ const deleteOne = async (params) => {
     }
     return await commentModel.findByIdAndRemove(validId)
 }
+
+const adminReply = async (params, body, adminId) => {
+    try {
+        const idComment = params.id || null
+        const content = body.content
+        console.log(adminId, content)
+        const { name } = await userModel.findById(adminId).select('name')
+        const validIdComment = mongoose.Types.ObjectId.isValid(idComment) ? new mongoose.Types.ObjectId(idComment) : null;
+        if (!validIdComment) {
+            const error = new Error("Invalid ID format");
+            error.status = "ERROR";
+            throw error;
+        }
+        if (name) {
+            let commentDb = await commentModel.findById(validIdComment)
+            commentDb.replyBy.push(
+                {
+                    adminId,
+                    fullname: name,
+                    content
+                }
+            )
+            return await commentDb.save()
+        }
+    } catch (error) {
+        throw error
+    }
+
+}
 module.exports = {
     createComment,
     getOne,
     getAll,
-    deleteOne
+    deleteOne,
+    adminReply
 }
 

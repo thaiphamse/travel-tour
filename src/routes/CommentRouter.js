@@ -6,10 +6,11 @@ const {
     // authUserMiddleWare,
 } = require("../MiddleWare/authMiddleWare");
 
-router.get('/:id', commentController.getOne)
-router.get('/', commentController.getAll)
 
 router.post('/', commentController.createComment)
+router.post('/:id/reply', authMiddleWare, commentController.adminReply)
 router.delete('/:id', commentController.deleteOne)
 
+router.get('/:id', commentController.getOne)
+router.get('/', commentController.getAll)
 module.exports = router;

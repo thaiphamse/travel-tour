@@ -1,5 +1,6 @@
 
 const commentService = require('../services/CommentService')
+const jwtService = require('../services/JwtService')
 const createComment = async (req, res, next) => {
     try {
         let comment = await commentService.createComment(req.body)
@@ -61,9 +62,27 @@ const deleteOne = async (req, res, next) => {
         next(error)
     }
 }
+const adminReply = async (req, res, next) => {
+    try {
+        const token = req.headers?.token?.split("Bearer ")[1];
+
+        const adminPayload = jwtService.getPayloadFromToken(token)
+        const adminId = adminPayload?.id
+        let commentRs = await commentService.adminReply(req.params, req.body, adminId)
+        return res.status(200).json({
+            status: "OK",
+            message: "SUCCESS",
+            data: commentRs
+        })
+    } catch (error) {
+        console.error(error.message)
+        next(error)
+    }
+}
 module.exports = {
     createComment,
     getOne,
     getAll,
-    deleteOne
+    deleteOne,
+    adminReply
 }

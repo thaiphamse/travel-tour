@@ -4,7 +4,7 @@ const CommentSchema = new mongoose.Schema(
   {
     fullname: { type: String, required: true },
     email: {
-      type: String, required: true,
+      type: String,
       validate: {
         validator: function (value) {
           // Regular expression for validating email format
@@ -15,7 +15,12 @@ const CommentSchema = new mongoose.Schema(
       }
     },
     phone: { type: String, required: true },
-    content: { type: String, required: true },
+    content: { type: String },
+    replyBy: [{
+      adminId: String,
+      fullname: String,
+      content: String
+    }],
     tour: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Tour'
