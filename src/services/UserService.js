@@ -296,6 +296,50 @@ const getGroupTourEmployeeLead = async (req, query) => {
     const token = req.headers?.token?.split("Bearer ")[1];
     const decoded = JwtService.getPayloadFromToken(token)
     let userId = decoded.id
+    let role = decoded.role
+
+    //Khi là admin thì cho xem lịch của tất cả nhân viên
+    if (role === 'admin') {
+      const bookingsGrouped = await bookingModel.aggregate([
+        {
+          $match: {
+            start_date: new Date(sdate),
+            tour_guide: {
+              $ne: null
+            } // So sánh start_date với ngày trong DB
+          }
+        },
+        {
+          $group: {
+            _id: '$tour_guide', // Nhóm theo userId của tour guide
+            bookings: { $push: '$$ROOT' } // Lưu danh sách các booking
+          }
+        },
+        {
+          $lookup: {
+            from: 'users', // Tên collection chứa thông tin user
+            localField: '_id', // _id trong bảng bookings là tour_guide (userId)
+            foreignField: '_id', // _id trong bảng users
+            as: 'guide_info' // Thông tin nhân viên sẽ được lưu trong guide_info
+          }
+        },
+        {
+          $unwind: '$guide_info' // Giải nén mảng guide_info để lấy chi tiết từng nhân viên
+        },
+        {
+          $project: {
+            userId: '$_id', // userId của tour guide
+            name: '$guide_info.name', // Lấy tên của nhân viên
+            email: '$guide_info.email', // Lấy email của nhân viên
+            phone: '$guide_info.phone', // Lấy email của nhân viên
+            role: '$guide_info.role', // Lấy email của nhân viên
+            bookings: 1,    // Danh sách các booking của họ
+            _id: 0           // Loại bỏ _id mặc định của MongoDB
+          }
+        }
+      ]);
+      return bookingsGrouped
+    }
     //Tìm userid trong db
     return await bookingModel.find({
       tour_guide: userId,

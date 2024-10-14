@@ -116,7 +116,7 @@ const getAll = async (query) => {
         })
         .populate({
             path: 'replyBy.adminId', // Populate the admin's details
-            select: 'fullname email phone', // Select specific fields to return
+            select: 'name email phone avatar', // Select specific fields to return
         })
         .populate({
             path: 'replyBy.comment',
