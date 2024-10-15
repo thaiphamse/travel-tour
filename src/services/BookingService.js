@@ -253,7 +253,7 @@ const calculateTotalPrice = async (
 const getBookings = async (query) => {
     const page = query.page || 1
     const limit = query.limit || 10
-    const sort = query.sort || "desc"
+    const sort = query.sort || "asc"
     const sortBy = query.sortBy || "createdAt"
     const tour_code = (query.tour_code) || null;
     const sdate = query.sdate || null
