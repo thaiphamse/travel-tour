@@ -7,13 +7,21 @@ const revenueTotal = async () => {
     try {
         const revenueTotal = await bookingModel.aggregate([
             {
+                $match: {
+                    payment_date: {
+                        $ne: null
+                    }
+                }
+            },
+            {
                 $group: {
                     _id: null,                // Không nhóm theo trường nào, chỉ cần tổng toàn bộ
-                    totalRevenue: { $sum: "$total_price" }  // Tính tổng trường totalAmount
+                    totalRevenue: { $sum: "$total_price" }, // Tính tổng trường totalAmount
+
                 }
             }
         ]);
-        return revenueTotal[0].totalRevenue
+        return revenueTotal[0]?.totalRevenue || 0
     } catch (error) {
         throw error
     }
