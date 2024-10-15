@@ -166,10 +166,18 @@ const deleteManyUser = (ids) => {
   });
 };
 
-const getAllUser = () => {
+const getAllUser = (query) => {
   return new Promise(async (resolve, reject) => {
+    const name = query.name || null
+    let filter = { role: { "$nin": ['admin'] } }
+
+    if (name) {
+      filter.name = {
+        $regex: name, $options: 'i'
+      }
+    }
     try {
-      const allUser = await User.find({ role: { "$nin": ['admin'] } });
+      const allUser = await User.find(filter);
       resolve({
         status: "OK",
         message: "success",
@@ -304,6 +312,7 @@ const getGroupTourEmployeeLead = async (req, query) => {
         {
           $match: {
             start_date: new Date(sdate),
+            // 'tour_guide.name': "Thai",
             tour_guide: {
               $ne: null
             } // So sánh start_date với ngày trong DB
@@ -345,7 +354,6 @@ const getGroupTourEmployeeLead = async (req, query) => {
       tour_guide: userId,
       start_date: sdate
     })
-    return userId
   } catch (error) {
     const err = new Error()
     err.status = "ERROR"
