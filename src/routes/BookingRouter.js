@@ -7,17 +7,17 @@ const {
 } = require("../MiddleWare/authMiddleWare");
 
 
-router.post('/', authMiddleWare, bookingController.createBooking)
-router.post('/group/assignment', bookingController.assignmentTourGuide)
+router.post('/', bookingController.createBooking)
+router.post('/group/assignment', authMiddleWare, bookingController.assignmentTourGuide)
 
 router.put('/:id/paid', bookingController.updatePaymentInfo)
 
-router.put('/:id', authMiddleWare, bookingController.updateBooking)
+router.put('/:id', bookingController.updateBooking)
 
 router.get("/my-booking", bookingController.getMyBooking);
-router.get('/groups', bookingController.getBookingsByGroup)
-router.get('/:id', bookingController.getBookDetail)
-router.get('/', bookingController.getBookings)
+router.get('/groups', authMiddleWare, bookingController.getBookingsByGroup)
+router.get('/:id', authMiddleWare, bookingController.getBookDetail)
+router.get('/', authMiddleWare, bookingController.getBookings)
 // router.delete('/:id', authMiddleWare, foodController.deleteFood)
 
 

@@ -54,7 +54,7 @@ const loginUser = (userLogin) => {
         email: email,
       }).select('+password');
       if (checkUser === null) {
-        resolve({
+        reject({
           status: "ERR",
           message: "The user is not defined",
         });
@@ -312,7 +312,6 @@ const getGroupTourEmployeeLead = async (req, query) => {
         {
           $match: {
             start_date: new Date(sdate),
-            // 'tour_guide.name': "Thai",
             tour_guide: {
               $ne: null
             } // So sánh start_date với ngày trong DB
