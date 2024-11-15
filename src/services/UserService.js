@@ -312,6 +312,7 @@ const getGroupTourEmployeeLead = async (req, query) => {
         {
           $match: {
             start_date: new Date(sdate),
+            is_cancel: false,
             tour_guide: {
               $ne: null
             } // So sánh start_date với ngày trong DB

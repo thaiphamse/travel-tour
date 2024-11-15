@@ -267,6 +267,15 @@ const getBookings = async (query) => {
     const filterFind = {}
     const skip = (page - 1) * limit;
     const status = query.status || null
+    const is_cancel = query.is_cancel || false
+    const is_checking = query.is_checking || false
+
+    if (is_cancel) {
+        filterFind.is_cancel = true
+    }
+    if (is_checking) {
+        filterFind.is_checking = true
+    }
 
     if (status) {
         filterFind.payment_status = status
