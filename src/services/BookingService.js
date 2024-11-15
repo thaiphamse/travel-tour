@@ -144,7 +144,7 @@ const updateBooking = async (params, data) => {
             console.log(filter, maxGroupNumber)
             //Đếm số vé có lớn hơn 10 chưa
             // Tìm nhóm hiện tại có số lượng booking
-            let groupName = `1-(${moment(new Date(filter.start_date)).format("DD/MM/YYYY")}->${moment(new Date(filter.end_date)).format("DD/MM/YYYY")})`;
+            let groupName = `1-(${moment(filter.start_date).utcOffset('+07:00').format('HH[h]mm-DD/MM/YYYY')}->${moment(filter.end_date).utcOffset('+07:00').format('HH[h]mm-DD/MM/YYYY')})`;
 
 
             if (maxGroupNumber.length > 0) {
@@ -164,12 +164,16 @@ const updateBooking = async (params, data) => {
             }, 0);
 
             let thisNewTicket = booking.adult_ticket + booking.child_ticket
+            console.log(currentGroupTotalTickets);
 
             if ((currentGroupTotalTickets + thisNewTicket) > 10) {
                 // Cập nhật group_number cho booking mới
-                booking.group_number = (Number(maxNumber) + 1) + `-(${moment(new Date(filter.start_date)).format("DD/MM/YYYY")}->${moment(new Date(filter.end_date)).format("DD/MM/YYYY")})`
+                console.log(1);
+
+                booking.group_number = (Number(maxNumber) + 1) + `-(${moment(filter.start_date).utcOffset('+07:00').format('HH[h]mm-DD/MM/YYYY')}->${moment(filter.end_date).utcOffset('+07:00').format('HH[h]mm-DD/MM/YYYY')})`
             } else {
                 booking.group_number = groupName
+                console.log(2);
 
                 booking.tour_guide = bookingsInGroup[0]?.tour_guide
             }
@@ -284,6 +288,7 @@ const getBookings = async (query) => {
     if (tour_name) {
         filter.name = { $regex: tour_name, $options: 'i' };
     }
+    console.log(filterFind)
 
     let total = await bookingModel.find(filterFind).populate({
         path: 'tour_id', // Trường được liên kết với bảng Tour

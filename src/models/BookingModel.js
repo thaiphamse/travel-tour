@@ -67,7 +67,16 @@ const bookingSchema = new mongoose.Schema(
         },
         address: {
             type: String
+        },
+        is_cancel: {
+            type: Boolean,
+            default: false
+        },
+        is_checking: {
+            type: Boolean,
+            default: false
         }
+
     },
     {
         timestamps: true,
@@ -90,6 +99,7 @@ bookingSchema.pre('save', async function (next) {
                 this.group_number = null
                 return next()
             }
+            console.log(filter)
             //Lấy ra group_number max trong db theo tour_id và ngày xuất phát
             const maxGroupNumber = await mongoose.model('Booking')
                 .find(filter)
@@ -97,9 +107,8 @@ bookingSchema.pre('save', async function (next) {
                 .limit(1)
                 .select('group_number')
 
-
             if (maxGroupNumber.length === 0) {
-                this.group_number = `1-(${moment(this.start_date).format('L')}->${moment(this.end_date).format('L')})`
+                this.group_number = `1-(${moment(this.start_date).utcOffset('+07:00').format('HH[h]mm-DD/MM/YYYY')}->${moment(this.end_date).utcOffset('+07:00').format('HH[h]mm-DD/MM/YYYY')})`
                 return next()
             }
 
@@ -112,6 +121,7 @@ bookingSchema.pre('save', async function (next) {
                 group_number: maxNumberString
             });
 
+            console.log(bookingsInGroup)
             // Tính tổng số vé hiện tại trong nhóm
             const currentGroupTotalTickets = bookingsInGroup.reduce((sum, booking) => {
                 return sum + booking.adult_ticket + booking.child_ticket;
@@ -120,7 +130,7 @@ bookingSchema.pre('save', async function (next) {
             // Nếu tổng số vé trong nhóm hiện tại cộng với vé mới vượt quá 20
             if ((currentGroupTotalTickets + totalTickets) > 10) {
                 // Cập nhật group_number cho booking mới
-                this.group_number = (Number(maxNumber) + 1) + `-(${moment(this.start_date).format('L')}->${moment(this.end_date).format('L')})`
+                this.group_number = (Number(maxNumber) + 1) + `-(${moment(this.start_date).utcOffset('+07:00').format('HH[h]mm-DD/MM/YYYY')}->${moment(this.end_date).utcOffset('+07:00').format('HH[h]mm-DD/MM/YYYY')})`
             } else {
                 this.group_number = maxNumberString
 
