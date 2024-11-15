@@ -133,10 +133,25 @@ const assignmentTourGuide = async (req, res, next) => {
         next(e)
     }
 }
+const checkingBooking = async (req, res, next) => {
+    try {
+        let rs = await bookingService.checkingBooking(req.params, req.body)
+        return res.status(200).json({
+            status: "OK",
+            message: "SUCCESS",
+            data: rs
+        })
+    } catch (error) {
+        console.log(error)
+
+        next(error)
+    }
+}
 module.exports = {
     createBooking,
     getBookDetail,
     updateBooking,
+    checkingBooking,
     getBookings,
     updatePaymentInfo,
     getBookingsByGroup,

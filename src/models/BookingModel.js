@@ -75,8 +75,11 @@ const bookingSchema = new mongoose.Schema(
         is_checking: {
             type: Boolean,
             default: false
+        },
+        customer_list: {
+            type: String,
+            default: ""
         }
-
     },
     {
         timestamps: true,

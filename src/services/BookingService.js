@@ -549,7 +549,8 @@ const assignmentGuideToBookings = async (data) => {
                 start_date,
                 end_date,
                 group_number,
-                tour_id: tour_id
+                tour_id: tour_id,
+                is_cancel: false
             },
             { tour_guide: tourGuide },
             { new: true }
@@ -566,6 +567,18 @@ const assignmentGuideToBookings = async (data) => {
         throw err;
     }
 }
+const checkingBooking = async (params, data) => {
+    try {
+        const id = params.id || null
+        return await bookingModel
+            .findOneAndUpdate({ _id: id }, data, { new: true })
+            .exec()
+
+    } catch (error) {
+        console.log(error)
+        throw err;
+    }
+}
 module.exports = {
     createBooking,
     getBookDetail,
@@ -574,5 +587,6 @@ module.exports = {
     updatePaymentInfo,
     getMyBooking,
     getBookingsByGroup,
-    assignmentGuideToBookings
+    assignmentGuideToBookings,
+    checkingBooking
 }

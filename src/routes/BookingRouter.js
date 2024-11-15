@@ -13,6 +13,7 @@ router.post('/group/assignment', authMiddleWare, bookingController.assignmentTou
 router.put('/:id/paid', bookingController.updatePaymentInfo)
 
 router.put('/:id', bookingController.updateBooking)
+router.put('/checking/:id', bookingController.checkingBooking)
 
 router.get("/my-booking", bookingController.getMyBooking);
 router.get('/groups', authMiddleWare, bookingController.getBookingsByGroup)
