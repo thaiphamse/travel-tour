@@ -43,6 +43,7 @@ const loginUser = async (req, res) => {
     const { email, password } = req.body;
     const reg = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
     const isCheckEmail = reg.test(email);
+    console.log(req)
     if (!email || !password) {
       return res.status(400).json({
         status: "ERR",
