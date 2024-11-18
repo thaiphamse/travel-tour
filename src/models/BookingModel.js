@@ -116,12 +116,14 @@ bookingSchema.pre("save", async function (next) {
         .limit(1)
         .select("group_number");
 
+      console.log("maxGroupNumber", maxGroupNumber)
+
       if (maxGroupNumber.length === 0) {
         this.group_number = `1-(${moment(this.start_date)
           .utcOffset("+07:00")
           .format("HH[h]mm-DD/MM/YYYY")}->${moment(this.end_date)
-          .utcOffset("+07:00")
-          .format("HH[h]mm-DD/MM/YYYY")})`;
+            .utcOffset("+07:00")
+            .format("HH[h]mm-DD/MM/YYYY")})`;
         return next();
       }
 
@@ -153,8 +155,8 @@ bookingSchema.pre("save", async function (next) {
           `-(${moment(this.start_date)
             .utcOffset("+07:00")
             .format("HH[h]mm-DD/MM/YYYY")}->${moment(this.end_date)
-            .utcOffset("+07:00")
-            .format("HH[h]mm-DD/MM/YYYY")})`;
+              .utcOffset("+07:00")
+              .format("HH[h]mm-DD/MM/YYYY")})`;
       } else {
         this.group_number = maxNumberString;
 

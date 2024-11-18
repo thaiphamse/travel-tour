@@ -313,6 +313,7 @@ const getGroupTourEmployeeLead = async (req, query) => {
     let userId = decoded.id;
     let role = decoded.role;
 
+    console.log(sdate)
     const startDate = moment(sdate, "MM/DD/YYYY").startOf("day").toDate(); // Đầu ngày
     const endDate = moment(sdate, "MM/DD/YYYY").endOf("day").toDate(); // Cuối ngày
     //Khi là admin thì cho xem lịch của tất cả nhân viên

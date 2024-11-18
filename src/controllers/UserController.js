@@ -227,6 +227,8 @@ const checkFreeScheduleUser = async (req, res, next) => {
 const getGroupTourEmployeeLead = async (req, res, next) => {
   try {
     const response = await UserService.getGroupTourEmployeeLead(req, req.query);
+    console.log(response);
+
     return res.status(200).json({
       status: "OK",
       message: "SUCCESS",

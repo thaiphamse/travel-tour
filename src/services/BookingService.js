@@ -145,7 +145,7 @@ const updateBooking = async (params, data) => {
       .findById(id) //Lưu tt status trước khi cập nhật
       .select("payment_status");
 
-    if (startTimeDb !== startTime || endTimeDb !== endTime) {
+    if ((data.start_date && data.end_date) && (startTimeDb !== startTime || endTimeDb !== endTime)) {
       console.log("phan nhom lai");
       //Tìm xem có nhóm nào xuất phát đúng thời gian này hay không
       let booking = await bookingModel
@@ -179,8 +179,8 @@ const updateBooking = async (params, data) => {
       let groupName = `1-(${moment(filter.start_date)
         .utcOffset("+07:00")
         .format("HH[h]mm-DD/MM/YYYY")}->${moment(filter.end_date)
-        .utcOffset("+07:00")
-        .format("HH[h]mm-DD/MM/YYYY")})`;
+          .utcOffset("+07:00")
+          .format("HH[h]mm-DD/MM/YYYY")})`;
 
       if (maxGroupNumber.length > 0) {
         groupName = maxGroupNumber[0].group_number;
@@ -213,8 +213,8 @@ const updateBooking = async (params, data) => {
           `-(${moment(filter.start_date)
             .utcOffset("+07:00")
             .format("HH[h]mm-DD/MM/YYYY")}->${moment(filter.end_date)
-            .utcOffset("+07:00")
-            .format("HH[h]mm-DD/MM/YYYY")})`;
+              .utcOffset("+07:00")
+              .format("HH[h]mm-DD/MM/YYYY")})`;
       } else {
         booking.group_number = groupName;
         console.log(2);
@@ -403,8 +403,14 @@ const getBookingsByGroup = async ({ query }) => {
   const tour_guide = query.tour_guide || null;
   const start_date = query.start_date || null;
 
+  let startofDate = moment(start_date, "MM/DD/YYYY").startOf("day").toDate()
+  let endOfDate = moment(start_date, "MM/DD/YYYY").endOf("day").toDate()
+
   if (start_date) {
-    filterBooking.start_date = new Date(start_date);
+    filterBooking.start_date = {
+      $gte: startofDate,
+      $lte: endOfDate,
+    };
   }
 
   if (tour_guide === "false") {
@@ -432,7 +438,7 @@ const getBookingsByGroup = async ({ query }) => {
         },
       },
       {
-        $sort: { start_date: 1 },
+        $sort: { createdAt: 1 },
       },
     ]);
     console.log(group_numbers);
@@ -449,7 +455,7 @@ const getBookingsByGroup = async ({ query }) => {
         ...filterBooking, // Không có tour_guide
       })
       .populate("tour_id tour_guide")
-      .sort({ start_date: "asc" });
+      .sort({ createdAt: "asc" });
     // console.log(bookingsGrouped, groupNumbers, filterBooking)
 
     if (bookingsGrouped.length === 0) {
